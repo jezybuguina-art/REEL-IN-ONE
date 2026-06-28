@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReelSystem Automated TOS Matrix Calculator</title>
+    <style>
+        /* CSS Root Custom Properties for Pastel Pink / Skyblue Theme & Crisp Printing */
+        :root {
+            --primary-accent: #FCE7F3; /* Pastel Pink Hue */
+            --bg-hue: #FFF1F2; /* Soft Rose Background */
+            --border-state: #FFE4E6; /* Soft Border State */
+            --slate-text: #1E293B; /* Slate Text */
+            --sky-accent: #E0F2FE; /* Sky Blue Accent */
+            --sky-border: #BAE6FD; /* Sky Blue Border */
+            --rose-deep: #BE123C; /* Rose Deep Text Accent */
+            --border-dark: #0F172A; /* Neo-Brutalist Border Line */
+        }
+
+        /* Basic Reset & Typography Rules */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-hue);
+            color: var(--slate-text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Top Header Navigation Strip */
+        header {
+            background-color: white;
+            border-bottom: 4px solid var(--border-dark);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-circle {
+            width: 2.2rem;
+            height: 2.2rem;
+            border-radius: 50%;
+            background-color: var(--primary-accent);
+            border: 3px solid var(--border-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1rem;
+            color: var(--rose-deep);
+            box-shadow: 2px 2px 0px rgba(0,0,0,1);
+        }
+
+        .title-group h1 {
+            font-size: 1.1rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.025em;
+            color: var(--border-dark);
+        }
+
+        .title-group p {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--rose-deep);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* Interactive Buttons styled with a modern tactile feel */
+        .btn {
+            padding: 0.5rem 1rem;
+            border: 3px solid var(--border-dark);
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: white;
+            color: var(--border-dark);
+            box-shadow: 3px 3px 0px rgba(0,0,0,1);
+        }
+
+        .btn:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0px rgba(0,0,0,1);
+        }
+
+        .btn:active {
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0px rgba(0,0,0,1);
+        }
+
+        .btn-accent {
+            background-color: var(--primary-accent);
+        }
+
+        .btn-sky {
+            background-color: var(--sky-accent);
+        }
+
+        .btn-danger {
+            background-color: #FECDD3;
+            color: #9F1239;
+        }
+
+        /* Main Workspace Container: Left controls panel & Right A4 Live Preview Canvas */
+        .workspace {
+            display: flex;
+            flex: 1;
+            width: 100%;
+            max-width: 1600px;
+            margin: 1.5rem auto;
+            padding: 0 1.5rem;
+            gap: 1.5rem;
+        }
+
+        /* Left Side Parameters / Configuration Panel */
+        .parameters-panel {
+            flex: 0 0 450px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .panel-card {
+            background-color: white;
+            border: 4px solid var(--border-dark);
+            border-radius: 16px;
+            padding: 1.25rem;
+            box-shadow: 4px 4px 0px rgba(0,0,0,1);
+        }
+
+        .panel-card-title {
+            font-size: 0.85rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding-bottom: 0.5rem;
+            border-b: 2px solid var(--border-state);
+            margin-bottom: 1rem;
+            color: var(--border-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 0.75rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748B;
+            margin-bottom: 0.25rem;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 2px solid var(--border-dark);
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--slate-text);
+            background-color: #F8FAFC;
+            transition: all 0.1s ease;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus {
+            outline: none;
+            background-color: white;
+            border-color: var(--rose-deep);
+            box-shadow: 0 0 0 3px rgba(190, 18, 60, 0.1);
+        }
+
+        /* Dynamic Competency Rows List inside Parameters Panel */
+        .competency-list-container {
+            max-height: 480px;
+            overflow-y: auto;
+            border: 2px solid var(--border-dark);
+            border-radius: 12px;
+            background-color: #F8FAFC;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .competency-item {
+            background-color: white;
+            border: 2px solid var(--border-dark);
+            border-radius: 10px;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        .competency-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .competency-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .comp-num {
+            font-size: 0.75rem;
+            font-weight: 900;
+            color: var(--rose-deep);
+        }
+
+        .remove-btn {
+            background: none;
+            border: none;
+            color: #EF4444;
+            font-weight: 900;
+            cursor: pointer;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+
+        .remove-btn:hover {
+            text-decoration: underline;
+        }
+
+        .taxonomy-checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0.25rem;
+            margin-top: 0.5rem;
+            background-color: var(--bg-hue);
+            padding: 0.4rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-state);
+        }
+
+        .checkbox-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .checkbox-container input {
+            cursor: pointer;
+            margin-bottom: 0.15rem;
+        }
+
+        .checkbox-label {
+            font-size: 0.55rem;
+            font-weight: 900;
+            text-align: center;
+            color: var(--slate-text);
+        }
+
+        /* Right Side A4 Landscape Sheet Preview Canvas */
+        .preview-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .canvas-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(255,255,255,0.8);
+            border: 2px solid var(--border-dark);
+            border-radius: 12px;
+            padding: 0.5rem 1rem;
+        }
+
+        .canvas-toolbar-text {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #64748B;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #10B981;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
+
+        /* A4 Landscape Sheet Design Constraints for Web Rendering */
+        .a4-landscape-sheet {
+            background-color: white;
+            border: 4px solid var(--border-dark);
+            border-radius: 16px;
+            box-shadow: 8px 8px 0px rgba(0,0,0,1);
+            width: 100%;
+            min-height: 700px;
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-x: auto;
+        }
+
+        /* Sheet Decorative Internal Border */
+        .sheet-border-box {
+            border: 2px dashed var(--border-dark);
+            padding: 1.5rem;
+            border-radius: 8px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 580px;
+        }
+
+        /* Academic Letterhead Header */
+        .sheet-header {
+            text-align: center;
+            border-bottom: 3px double var(--border-dark);
+            padding-bottom: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .sheet-school-name {
+            font-size: 0.75rem;
+            font-weight: 900;
+            color: #64748B;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 0.15rem;
+        }
+
+        .sheet-main-title {
+            font-size: 1.35rem;
+            font-weight: 950;
+            color: var(--border-dark);
+            text-transform: uppercase;
+            letter-spacing: -0.01em;
+            margin-bottom: 0.5rem;
+        }
+
+        .sheet-tag {
+            display: inline-block;
+            background-color: var(--primary-accent);
+            border: 2px solid var(--border-dark);
+            font-size: 0.65rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            padding: 0.2rem 0.75rem;
+            border-radius: 9999px;
+            box-shadow: 1.5px 1.5px 0px rgba(0,0,0,1);
+        }
+
+        /* Metadata Details Strip */
+        .sheet-metadata-strip {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+            background-color: var(--bg-hue);
+            border: 2px solid var(--border-dark);
+            border-radius: 8px;
+            padding: 0.75rem;
+        }
+
+        .metadata-cell {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--slate-text);
+        }
+
+        .metadata-label {
+            font-size: 0.55rem;
+            font-weight: 900;
+            color: #64748B;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.15rem;
+        }
+
+        .metadata-val {
+            font-weight: 900;
+            color: var(--border-dark);
+        }
+
+        /* Matrix Data Table Standards */
+        .tos-table-container {
+            flex: 1;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--border-dark);
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.5rem 0.6rem;
+            border: 2px solid var(--border-dark);
+        }
+
+        th.bloom-col {
+            text-align: center;
+            width: 7%;
+        }
+
+        td {
+            padding: 0.45rem 0.6rem;
+            border: 1px solid var(--border-dark);
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--slate-text);
+        }
+
+        /* Thick double-weight borders on critical columns */
+        td.competency-desc-td {
+            font-weight: 800;
+            color: var(--border-dark);
+        }
+
+        td.number-col {
+            text-align: center;
+            font-weight: 900;
+        }
+
+        td.bloom-cell {
+            text-align: center;
+            font-family: monospace;
+            font-size: 0.8rem;
+            font-weight: 900;
+        }
+
+        td.zero-item {
+            color: #CBD5E1;
+            font-weight: 500;
+        }
+
+        tr.summary-row {
+            background-color: var(--primary-accent);
+            border-top: 3px solid var(--border-dark);
+        }
+
+        tr.summary-row td {
+            font-weight: 900;
+            font-size: 0.7rem;
+            color: var(--border-dark);
+            text-transform: uppercase;
+        }
+
+        /* Signature Verification Section at the Foot of the Sheet */
+        .sheet-footer {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--border-state);
+        }
+
+        .signature-box {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--slate-text);
+        }
+
+        .signature-label {
+            font-size: 0.55rem;
+            font-weight: 900;
+            color: #64748B;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1.5rem;
+        }
+
+        .signature-line {
+            border-bottom: 2px solid var(--border-dark);
+            height: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .signature-name {
+            font-weight: 900;
+            color: var(--border-dark);
+            text-transform: uppercase;
+        }
+
+        .signature-sub {
+            font-size: 0.55rem;
+            font-weight: 500;
+            color: #64748B;
+        }
+
+        /* Brand Footer */
+        .brand-footer {
+            text-align: center;
+            font-size: 0.55rem;
+            font-weight: 900;
+            letter-spacing: 0.15em;
+            color: #94A3B8;
+            text-transform: uppercase;
+            margin-top: 1rem;
+        }
+
+        /* Printing Style Target Overrides */
+        @media print {
+            /* Set print page standard to landscape */
+            @page {
+                size: A4 landscape;
+                margin: 0mm;
+            }
+
+            body {
+                background-color: white !important;
+                color: #000000 !important;
+                min-height: auto;
+            }
+
+            /* Hide everything that is not the landscape print sheet */
+            header, .parameters-panel, .canvas-toolbar, .no-print {
+                display: none !important;
+            }
+
+            .workspace {
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .preview-area {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .a4-landscape-sheet {
+                border: none !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                padding: 15mm !important;
+                position: absolute;
+                top: 0;
+                left: 0;
+            }
+
+            .sheet-border-box {
+                border: 2px solid var(--border-dark) !important;
+                min-height: 180mm !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Header Navigation Strip -->
+    <header>
+        <div class="logo-area">
+            <div class="logo-circle">R</div>
+            <div class="title-group">
+                <h1 id="lbl-main-title">ReelSystem Automated TOS Matrix Calculator</h1>
+                <p id="lbl-main-sub">Professional Academic Table of Specifications Balancing Tool</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-accent" id="btn-lang" onclick="toggleLanguage()">
+                🌐 Switch to Filipino
+            </button>
+            <button class="btn btn-sky" id="btn-print" onclick="window.print()">
+                🖨️ Print Landscape TOS
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Dynamic Workspace Grid -->
+    <main class="workspace">
+        
+        <!-- Left Parameters & Competency Input Block -->
+        <section class="parameters-panel no-print">
+            
+            <!-- School Context Panel -->
+            <div class="panel-card">
+                <div class="panel-card-title">
+                    🏫 <span id="lbl-ctx-title">Header Data Fields</span>
+                </div>
+                <div class="form-group">
+                    <label id="lbl-school-name">School Name</label>
+                    <input type="text" id="school-name" value="ReelSystem Exemplar School" oninput="updateMetadata()">
+                </div>
+                <div class="form-group">
+                    <label id="lbl-subject-area">Subject Area</label>
+                    <input type="text" id="subject-area" value="English Syntax and Composition" oninput="updateMetadata()">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label id="lbl-grade-level">Grade Level</label>
+                        <input type="text" id="grade-level" value="Senior High (Grades 11-12)" oninput="updateMetadata()">
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-target-quarter">Target Quarter</label>
+                        <input type="text" id="target-quarter" value="First Quarter" oninput="updateMetadata()">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label id="lbl-teacher-name">Teacher Name</label>
+                    <input type="text" id="teacher-name" value="Prof. Maria Santos" oninput="updateMetadata()">
+                </div>
+            </div>
+
+            <!-- Matrix Balancing Parameters Panel -->
+            <div class="panel-card" style="flex: 1; display: flex; flex-direction: column;">
+                <div class="panel-card-title">
+                    📊 <span id="lbl-balance-title">Test Balance Settings</span>
+                </div>
+                
+                <div class="form-row" style="margin-bottom: 1rem;">
+                    <div class="form-group">
+                        <label id="lbl-total-items">Total Test Items</label>
+                        <input type="number" id="total-items" value="30" min="5" max="200" oninput="computeTOSMatrix()">
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: flex-end;">
+                        <button class="btn btn-sky" style="width: 100%; justify-content: center;" id="btn-add-comp" onclick="addCompetencyRow()">
+                            + Add Row
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Competency Dynamic List -->
+                <div class="competency-list-container" id="competency-list">
+                    <!-- Dynamic Competency Rows Will Be Spawned Here -->
+                </div>
+
+                <!-- Run Procedural Engine Button -->
+                <button class="btn btn-accent" style="width: 100%; padding: 0.75rem; justify-content: center; font-size: 0.9rem;" id="btn-compute" onclick="computeTOSMatrix()">
+                    🔄 Compute & Balance TOS Matrix
+                </button>
+            </div>
+
+        </section>
+
+        <!-- Right Landscape Sheet Canvas Preview -->
+        <section class="preview-area">
+            
+            <!-- Live Preview Badge Header Toolbar -->
+            <div class="canvas-toolbar no-print">
+                <div class="canvas-toolbar-text">
+                    <span class="pulse-dot"></span>
+                    <span id="lbl-live-canvas">Live A4 Landscape Sheet Preview</span>
+                </div>
+                <span style="font-size: 0.7rem; font-weight: 800; color: #64748B;" id="lbl-sig-system">
+                    EXCLUSIVE IDENTITY: ReelSystem
+                </span>
+            </div>
+
+            <!-- Landscape A4 Card Board Canvas -->
+            <div class="a4-landscape-sheet" id="tos-print-sheet">
+                
+                <div class="sheet-border-box">
+                    
+                    <!-- Official Exam Header -->
+                    <div class="sheet-header">
+                        <div class="sheet-school-name" id="sheet-school-display">REELSYSTEM EXEMPLAR SCHOOL</div>
+                        <div class="sheet-main-title" id="sheet-title-display">TABLE OF SPECIFICATIONS (TOS) MATRIX</div>
+                        <div class="sheet-tag" id="sheet-sub-display">Academic Assessment Matrix</div>
+                    </div>
+
+                    <!-- Metadata details grid block -->
+                    <div class="sheet-metadata-strip">
+                        <div class="metadata-cell">
+                            <div class="metadata-label" id="lbl-meta-subject">Subject Area</div>
+                            <div class="metadata-val" id="disp-subject">English Syntax and Composition</div>
+                        </div>
+                        <div class="metadata-cell">
+                            <div class="metadata-label" id="lbl-meta-grade">Grade Level</div>
+                            <div class="metadata-val" id="disp-grade">Senior High (Grades 11-12)</div>
+                        </div>
+                        <div class="metadata-cell">
+                            <div class="metadata-label" id="lbl-meta-quarter">Target Quarter</div>
+                            <div class="metadata-val" id="disp-quarter">First Quarter</div>
+                        </div>
+                        <div class="metadata-cell">
+                            <div class="metadata-label" id="lbl-meta-items">Total Test Items</div>
+                            <div class="metadata-val" id="disp-items">30 Items</div>
+                        </div>
+                    </div>
+
+                    <!-- Main Balanced Table Grid -->
+                    <div class="tos-table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th id="th-comp" style="width: 38%;">Learning Competency Description</th>
+                                    <th id="th-days" style="width: 10%; text-align: center;">Days Taught</th>
+                                    <th id="th-weight" style="width: 10%; text-align: center;">Weight (%)</th>
+                                    <th id="th-items" style="width: 10%; text-align: center;">Total Items</th>
+                                    <th class="bloom-col" id="th-r">R</th>
+                                    <th class="bloom-col" id="th-u">U</th>
+                                    <th class="bloom-col" id="th-ap">Ap</th>
+                                    <th class="bloom-col" id="th-an">An</th>
+                                    <th class="bloom-col" id="th-e">E</th>
+                                    <th class="bloom-col" id="th-c">C</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tos-table-body">
+                                <!-- Computed Balances Rows Inserted Here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Academic Certification Blocks at the Base -->
+                    <div class="sheet-footer">
+                        <div class="signature-box">
+                            <div class="signature-label" id="lbl-prepared">Prepared by:</div>
+                            <div class="signature-line"></div>
+                            <div class="signature-name" id="disp-prepared">Prof. Maria Santos</div>
+                            <div class="signature-sub" id="sub-teacher">Subject Teacher</div>
+                        </div>
+                        <div class="signature-box">
+                            <div class="signature-label" id="lbl-checked">Checked by:</div>
+                            <div class="signature-line"></div>
+                            <div class="signature-name">___________________________</div>
+                            <div class="signature-sub" id="sub-dept">Department Head / Coordinator</div>
+                        </div>
+                        <div class="signature-box">
+                            <div class="signature-label" id="lbl-approved">Approved by:</div>
+                            <div class="signature-line"></div>
+                            <div class="signature-name">___________________________</div>
+                            <div class="signature-sub" id="sub-principal">School Principal / Director</div>
+                        </div>
+                    </div>
+
+                    <!-- Non-Erasable Brand Identity Signature -->
+                    <div class="brand-footer">
+                        Powered by ReelSystem Academic Assessment Matrix Engine • Verification ID: REEL-TOS-99A
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Script Block for Matrix Balancing App Logic -->
+    <script>
+        // Internationalization Dictionaries
+        const i18n = {
+            en: {
+                mainTitle: "ReelSystem Automated TOS Matrix Calculator",
+                mainSub: "Professional Academic Table of Specifications Balancing Tool",
+                langBtn: "🌐 Switch to Filipino",
+                printBtn: "🖨️ Print Landscape TOS",
+                ctxTitle: "Header Data Fields",
+                schoolName: "School Name",
+                subjectArea: "Subject Area",
+                gradeLevel: "Grade Level",
+                targetQuarter: "Target Quarter",
+                teacherName: "Teacher Name",
+                balanceTitle: "Test Balance Settings",
+                totalItems: "Total Test Items",
+                addRow: "+ Add Row",
+                computeBtn: "🔄 Compute & Balance TOS Matrix",
+                liveCanvas: "Live A4 Landscape Sheet Preview",
+                prepared: "Prepared by:",
+                checked: "Checked by:",
+                approved: "Approved by:",
+                teacherSub: "Subject Teacher",
+                deptSub: "Department Head / Coordinator",
+                principalSub: "School Principal / Director",
+                thComp: "Learning Competency Description",
+                thDays: "Days Taught",
+                thWeight: "Weight (%)",
+                thItems: "Total Items",
+                placeholderComp: "Learning Competency Description...",
+                alertDays: "Please input at least 1 day taught across your competencies.",
+                alertNoRows: "Please add at least one competency row to compute.",
+                metaSubject: "Subject Area",
+                metaGrade: "Grade Level",
+                metaQuarter: "Target Quarter",
+                metaItems: "Total Test Items",
+                sheetTitle: "TABLE OF SPECIFICATIONS (TOS) MATRIX",
+                sheetSub: "Academic Assessment Matrix",
+                summaryLabel: "Total Summary / Kabuuang Balanse"
+            },
+            fil: {
+                mainTitle: "Awtomatikong Kalkulator ng Plano ng Pagsusulit (TOS) ng ReelSystem",
+                mainSub: "Propesyonal na Kagamitan sa Pagbabalanse ng Table of Specifications",
+                langBtn: "🌐 Lumipat sa Ingles",
+                printBtn: "🖨️ I-print ang Landscape TOS",
+                ctxTitle: "Impormasyon ng Paaralan at Header",
+                schoolName: "Pangalan ng Paaralan",
+                subjectArea: "Asignatura / Paksa",
+                gradeLevel: "Antas at Seksyon",
+                targetQuarter: "Markahan",
+                teacherName: "Pangalan ng Guro",
+                balanceTitle: "Mga Setting ng Pagsusulit",
+                totalItems: "Kabuuang Bilang ng Tanong",
+                addRow: "+ Magdagdag",
+                computeBtn: "🔄 Pindutin upang Balansehin ang TOS Matrix",
+                liveCanvas: "Live na Preview ng Landscape A4 Sheet",
+                prepared: "Inihanda ni:",
+                checked: "Sinuri ni:",
+                approved: "Inaprubahan ni:",
+                teacherSub: "Guro ng Asignatura",
+                deptSub: "Pinuno ng Departamento",
+                principalSub: "Punong-Guro ng Paaralan",
+                thComp: "Kasanayang Pampagkatuto (Learning Competency)",
+                thDays: "Araw na Itinuro",
+                thWeight: "Timbang (%)",
+                thItems: "Kabuuang Tanong",
+                placeholderComp: "Isulat ang kasanayang pampagkatuto dito...",
+                alertDays: "Mangyaring maglagay ng kahit isang araw na itinuro sa mga kasanayan.",
+                alertNoRows: "Magdagdag ng kahit isang kasanayan upang makalkula.",
+                metaSubject: "Asignatura",
+                metaGrade: "Antas",
+                metaQuarter: "Markahan",
+                metaItems: "Kabuuang Bilang ng Tanong",
+                sheetTitle: "TABLE OF SPECIFICATIONS (TOS) MATRIX",
+                sheetSub: "Talahanayan ng Ispesipikasyon",
+                summaryLabel: "KABUUAN / TOTAL SUMMARY"
+            }
+        };
+
+        let currentLang = 'en';
+
+        // Prepopulated Academic Demonstration Rows
+        const defaultCompetencies = [
+            {
+                desc: "Identify primary themes, historical allegories, and recurring literary devices in modern essays.",
+                days: 8,
+                levels: { R: true, U: true, Ap: false, An: true, E: false, C: false }
+            },
+            {
+                desc: "Formulate analytical outlines, synthesis diagrams, and visual maps for classroom composition planning.",
+                days: 12,
+                levels: { R: false, U: false, Ap: true, An: false, E: false, C: true }
+            },
+            {
+                desc: "Evaluate the rhetorical strength of supporting evidence, text arguments, and citation links.",
+                days: 7,
+                levels: { R: false, U: false, Ap: false, An: true, E: true, C: false }
+            },
+            {
+                desc: "Apply standardized referencing conventions, footnotes, and citation schemas in research drafts.",
+                days: 5,
+                levels: { R: false, U: true, Ap: true, An: false, E: false, C: false }
+            }
+        ];
+
+        // On Page Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            // Load Demo Rows
+            defaultCompetencies.forEach(comp => {
+                createRowElement(comp.desc, comp.days, comp.levels);
+            });
+            
+            // Execute Balancing Calculations immediately
+            computeTOSMatrix();
+            updateMetadata();
+        });
+
+        // Function to create and insert a new competency row entry in the left panel
+        let rowCounter = 0;
+        function createRowElement(initialDesc = "", initialDays = 5, initialLevels = null) {
+            const listContainer = document.getElementById('competency-list');
+            const rowId = `comp-row-${rowCounter++}`;
+            
+            const levels = initialLevels || { R: true, U: true, Ap: false, An: false, E: false, C: false };
+
+            const div = document.createElement('div');
+            div.className = 'competency-item competency-row';
+            div.id = rowId;
+            div.innerHTML = `
+                <div class="competency-item-header">
+                    <span class="comp-num font-black text-xs">Competency</span>
+                    <button class="remove-btn" onclick="removeCompetencyRow('${rowId}')">Remove</button>
+                </div>
+                <div class="form-group">
+                    <input type="text" class="comp-desc" value="${initialDesc}" placeholder="${i18n[currentLang].placeholderComp}" oninput="computeTOSMatrix()">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label style="font-size: 0.6rem;">Days Taught</label>
+                    <input type="number" class="comp-days" value="${initialDays}" min="1" max="100" oninput="computeTOSMatrix()" style="padding: 0.4rem 0.6rem;">
+                </div>
+                <div class="taxonomy-checkbox-grid">
+                    <label class="checkbox-container">
+                        <input type="checkbox" class="cb-r" ${levels.R ? 'checked' : ''} onchange="computeTOSMatrix()">
+                        <span class="checkbox-label">R</span>
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" class="cb-u" ${levels.U ? 'checked' : ''} onchange="computeTOSMatrix()">
+                        <span class="checkbox-label">U</span>
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" class="cb-ap" ${levels.Ap ? 'checked' : ''} onchange="computeTOSMatrix()">
+                        <span class="checkbox-label">Ap</span>
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" class="cb-an" ${levels.An ? 'checked' : ''} onchange="computeTOSMatrix()">
+                        <span class="checkbox-label">An</span>
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" class="cb-e" ${levels.E ? 'checked' : ''} onchange="computeTOSMatrix()">
+                        <span class="checkbox-label">E</span>
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" class="cb-c" ${levels.C ? 'checked' : ''} onchange="computeTOSMatrix()">
+                        <span class="checkbox-label">C</span>
+                    </label>
+                </div>
+            `;
+            
+            listContainer.appendChild(div);
+        }
+
+        // Add Competency Row trigger button handler
+        function addCompetencyRow() {
+            createRowElement("", 5, { R: true, U: true, Ap: false, An: false, E: false, C: false });
+            computeTOSMatrix();
+        }
+
+        // Remove Competency row with safety triggers
+        function removeCompetencyRow(rowId) {
+            const row = document.getElementById(rowId);
+            if (row) {
+                row.remove();
+                computeTOSMatrix();
+            }
+        }
+
+        // Update sheet metadata fields immediately from input changes
+        function updateMetadata() {
+            const schoolName = document.getElementById('school-name').value;
+            const subjectArea = document.getElementById('subject-area').value;
+            const gradeLevel = document.getElementById('grade-level').value;
+            const targetQuarter = document.getElementById('target-quarter').value;
+            const teacherName = document.getElementById('teacher-name').value;
+            const totalItems = document.getElementById('total-items').value;
+
+            document.getElementById('sheet-school-display').innerText = schoolName.toUpperCase();
+            document.getElementById('disp-subject').innerText = subjectArea;
+            document.getElementById('disp-grade').innerText = gradeLevel;
+            document.getElementById('disp-quarter').innerText = targetQuarter;
+            document.getElementById('disp-items').innerText = `${totalItems} Items`;
+            document.getElementById('disp-prepared').innerText = teacherName;
+        }
+
+        // Language Switching Mechanism
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'fil' : 'en';
+            
+            // UI elements update
+            document.getElementById('lbl-main-title').innerText = i18n[currentLang].mainTitle;
+            document.getElementById('lbl-main-sub').innerText = i18n[currentLang].mainSub;
+            document.getElementById('btn-lang').innerText = i18n[currentLang].langBtn;
+            document.getElementById('btn-print').innerText = i18n[currentLang].printBtn;
+            
+            document.getElementById('lbl-ctx-title').innerText = i18n[currentLang].ctxTitle;
+            document.getElementById('lbl-school-name').innerText = i18n[currentLang].schoolName;
+            document.getElementById('lbl-subject-area').innerText = i18n[currentLang].subjectArea;
+            document.getElementById('lbl-grade-level').innerText = i18n[currentLang].gradeLevel;
+            document.getElementById('lbl-target-quarter').innerText = i18n[currentLang].targetQuarter;
+            document.getElementById('lbl-teacher-name').innerText = i18n[currentLang].teacherName;
+            
+            document.getElementById('lbl-balance-title').innerText = i18n[currentLang].balanceTitle;
+            document.getElementById('lbl-total-items').innerText = i18n[currentLang].totalItems;
+            document.getElementById('btn-add-comp').innerText = i18n[currentLang].addRow;
+            document.getElementById('btn-compute').innerText = i18n[currentLang].computeBtn;
+            document.getElementById('lbl-live-canvas').innerText = i18n[currentLang].liveCanvas;
+            
+            // Display Sheet Labels Update
+            document.getElementById('sheet-title-display').innerText = i18n[currentLang].sheetTitle;
+            document.getElementById('sheet-sub-display').innerText = i18n[currentLang].sheetSub;
+            
+            document.getElementById('lbl-meta-subject').innerText = i18n[currentLang].metaSubject;
+            document.getElementById('lbl-meta-grade').innerText = i18n[currentLang].metaGrade;
+            document.getElementById('lbl-meta-quarter').innerText = i18n[currentLang].metaQuarter;
+            document.getElementById('lbl-meta-items').innerText = i18n[currentLang].metaItems;
+            
+            document.getElementById('th-comp').innerText = i18n[currentLang].thComp;
+            document.getElementById('th-days').innerText = i18n[currentLang].thDays;
+            document.getElementById('th-weight').innerText = i18n[currentLang].thWeight;
+            document.getElementById('th-items').innerText = i18n[currentLang].thItems;
+
+            document.getElementById('lbl-prepared').innerText = i18n[currentLang].prepared;
+            document.getElementById('lbl-checked').innerText = i18n[currentLang].checked;
+            document.getElementById('lbl-approved').innerText = i18n[currentLang].approved;
+            document.getElementById('sub-teacher').innerText = i18n[currentLang].teacherSub;
+            document.getElementById('sub-dept').innerText = i18n[currentLang].deptSub;
+            document.getElementById('sub-principal').innerText = i18n[currentLang].principalSub;
+
+            // Update placeholders of existing rows
+            const descInputs = document.querySelectorAll('.comp-desc');
+            descInputs.forEach(input => {
+                input.placeholder = i18n[currentLang].placeholderComp;
+            });
+
+            // Re-run Matrix computation to apply table-level text changes
+            computeTOSMatrix();
+        }
+
+        // Core Offline Procedural Matrix Balancing App Engine (Apportionment + Equal Taxonomy Distribution)
+        function computeTOSMatrix() {
+            const rows = document.querySelectorAll('.competency-row');
+            const totalTestItems = parseInt(document.getElementById('total-items').value) || 30;
+
+            if (rows.length === 0) {
+                document.getElementById('tos-table-body').innerHTML = `
+                    <tr>
+                        <td colspan="10" style="text-align: center; font-style: italic; color: #94A3B8; padding: 2rem;">
+                            ${i18n[currentLang].alertNoRows}
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const competencies = [];
+            let totalDays = 0;
+
+            rows.forEach((row, idx) => {
+                const descInput = row.querySelector('.comp-desc');
+                const daysInput = row.querySelector('.comp-days');
+                
+                const desc = descInput.value.trim() || `Learning Competency / Aralin #${idx + 1}`;
+                const days = parseInt(daysInput.value) || 0;
+
+                const rChecked = row.querySelector('.cb-r').checked;
+                const uChecked = row.querySelector('.cb-u').checked;
+                const apChecked = row.querySelector('.cb-ap').checked;
+                const anChecked = row.querySelector('.cb-an').checked;
+                const eChecked = row.querySelector('.cb-e').checked;
+                const cChecked = row.querySelector('.cb-c').checked;
+
+                const levels = {
+                    R: rChecked,
+                    U: uChecked,
+                    Ap: apChecked,
+                    An: anChecked,
+                    E: eChecked,
+                    C: cChecked
+                };
+
+                const checkedCount = Object.values(levels).filter(Boolean).length;
+
+                competencies.push({
+                    id: idx,
+                    desc: desc,
+                    days: days,
+                    levels: levels,
+                    checkedCount: checkedCount,
+                    totalItems: 0,
+                    distributed: { R: 0, U: 0, Ap: 0, An: 0, E: 0, C: 0 }
+                });
+
+                totalDays += days;
+            });
+
+            if (totalDays === 0) {
+                document.getElementById('tos-table-body').innerHTML = `
+                    <tr>
+                        <td colspan="10" style="text-align: center; font-style: italic; color: #94A3B8; padding: 2rem;">
+                            ${i18n[currentLang].alertDays}
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // 1. Apportion row total item allocations cleanly using the Largest Remainder Method (Hamilton Method)
+            // to eliminate any cumulative rounding issues and match the target totalTestItems sum exactly.
+            let floorSum = 0;
+            competencies.forEach(comp => {
+                const exactShare = (comp.days / totalDays) * totalTestItems;
+                comp.exactShare = exactShare;
+                comp.floorShare = Math.floor(exactShare);
+                comp.fractional = exactShare - comp.floorShare;
+                comp.totalItems = comp.floorShare;
+                floorSum += comp.floorShare;
+            });
+
+            let remainder = totalTestItems - floorSum;
+            if (remainder > 0) {
+                // Sort by fractional share descending
+                const indices = [...competencies.keys()].sort((a, b) => {
+                    return competencies[b].fractional - competencies[a].fractional;
+                });
+                for (let i = 0; i < remainder; i++) {
+                    const idx = indices[i % indices.length];
+                    competencies[idx].totalItems += 1;
+                }
+            }
+
+            // 2. Distribute each row's integer total items equally across its checked Revised Bloom's Taxonomy levels.
+            competencies.forEach(comp => {
+                let n = comp.checkedCount;
+                let levelsToUse = comp.levels;
+
+                // Fallback: If no checkbox is selected, treat all 6 levels as selected to avoid isolated divisions by zero.
+                if (n === 0) {
+                    levelsToUse = { R: true, U: true, Ap: true, An: true, E: true, C: true };
+                    n = 6;
+                }
+
+                const items = comp.totalItems;
+                if (items > 0) {
+                    const base = Math.floor(items / n);
+                    const rem = items % n;
+
+                    const keys = ['R', 'U', 'Ap', 'An', 'E', 'C'];
+                    const activeKeys = keys.filter(k => levelsToUse[k]);
+
+                    // Assign base questions
+                    activeKeys.forEach(k => {
+                        comp.distributed[k] = base;
+                    });
+
+                    // Distribute remaining fractional questions one-by-one to checked levels
+                    for (let i = 0; i < rem; i++) {
+                        const k = activeKeys[i % activeKeys.length];
+                        comp.distributed[k] += 1;
+                    }
+                }
+            });
+
+            // 3. Render the Balanced Output into the preview canvas table
+            renderTOSPreview(competencies, totalDays, totalTestItems);
+            updateMetadata();
+        }
+
+        // Secondary rendering helper that updates the preview sheet's table body and footer rows
+        function renderTOSPreview(competencies, totalDays, totalTestItems) {
+            const tableBody = document.getElementById('tos-table-body');
+            tableBody.innerHTML = '';
+
+            let totalR = 0;
+            let totalU = 0;
+            let totalAp = 0;
+            let totalAn = 0;
+            let totalE = 0;
+            let totalC = 0;
+            let totalAllocatedItems = 0;
+
+            competencies.forEach(comp => {
+                const weightPercentage = totalDays > 0 ? ((comp.days / totalDays) * 100).toFixed(2) : '0.00';
+                
+                totalR += comp.distributed.R;
+                totalU += comp.distributed.U;
+                totalAp += comp.distributed.Ap;
+                totalAn += comp.distributed.An;
+                totalE += comp.distributed.E;
+                totalC += comp.distributed.C;
+                totalAllocatedItems += comp.totalItems;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="competency-desc-td">${comp.desc}</td>
+                    <td class="number-col">${comp.days}</td>
+                    <td class="number-col" style="font-family: monospace;">${weightPercentage}%</td>
+                    <td class="number-col" style="background-color: var(--bg-hue);">${comp.totalItems}</td>
+                    <td class="bloom-cell ${comp.distributed.R === 0 ? 'zero-item' : ''}">${comp.distributed.R || '-'}</td>
+                    <td class="bloom-cell ${comp.distributed.U === 0 ? 'zero-item' : ''}">${comp.distributed.U || '-'}</td>
+                    <td class="bloom-cell ${comp.distributed.Ap === 0 ? 'zero-item' : ''}">${comp.distributed.Ap || '-'}</td>
+                    <td class="bloom-cell ${comp.distributed.An === 0 ? 'zero-item' : ''}">${comp.distributed.An || '-'}</td>
+                    <td class="bloom-cell ${comp.distributed.E === 0 ? 'zero-item' : ''}">${comp.distributed.E || '-'}</td>
+                    <td class="bloom-cell ${comp.distributed.C === 0 ? 'zero-item' : ''}">${comp.distributed.C || '-'}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+
+            // Summary Row insertion with correct sum counts
+            const summaryTr = document.createElement('tr');
+            summaryTr.className = 'summary-row';
+            summaryTr.innerHTML = `
+                <td>${i18n[currentLang].summaryLabel}</td>
+                <td class="number-col">${totalDays}</td>
+                <td class="number-col">100.00%</td>
+                <td class="number-col" style="background-color: var(--primary-accent);">${totalAllocatedItems}</td>
+                <td class="bloom-cell">${totalR || '-'}</td>
+                <td class="bloom-cell">${totalU || '-'}</td>
+                <td class="bloom-cell">${totalAp || '-'}</td>
+                <td class="bloom-cell">${totalAn || '-'}</td>
+                <td class="bloom-cell">${totalE || '-'}</td>
+                <td class="bloom-cell">${totalC || '-'}</td>
+            `;
+            tableBody.appendChild(summaryTr);
+        }
+    </script>
+</body>
+</html>

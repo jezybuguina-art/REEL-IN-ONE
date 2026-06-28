@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReelSystem Procedural Performance Criteria Sheet Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Load Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;700&display=swap');
+    
+    body {
+      font-family: "Inter", sans-serif;
+      background-color: #FFF1F2; /* Soft pastel pink background canvas */
+      color: #1E293B; /* High-contrast Slate typography */
+    }
+
+    .font-display {
+      font-family: "Space Grotesk", sans-serif;
+    }
+
+    .font-mono {
+      font-family: "JetBrains Mono", monospace;
+    }
+
+    /* Print styling rules */
+    @media print {
+      @page {
+        size: A4 portrait !important;
+        margin: 10mm !important;
+      }
+      
+      body {
+        background-color: #ffffff !important;
+        color: #1E293B !important;
+      }
+
+      /* Hide sidebar and any non-print elements */
+      .no-print {
+        display: none !important;
+        visibility: hidden !important;
+      }
+
+      /* Force A4 document canvas layout */
+      .print-canvas {
+        width: 190mm !important;
+        height: 277mm !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        background: white !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+
+      /* Shading preservation inside headers and tables */
+      .print-bg-shade {
+        background-color: #FCE7F3 !important; /* Soft pastel pink accent */
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+
+      .print-border {
+        border: 2px solid #1E293B !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 p-4 md:p-8 flex flex-col justify-between">
+
+  <!-- TOP HEADER HUB -->
+  <header class="max-w-7xl mx-auto w-full mb-6 no-print flex flex-col sm:flex-row justify-between items-center bg-white border-4 border-slate-900 rounded-3xl p-5 shadow-[4px_4px_0px_rgba(0,0,0,1)] gap-4">
+    <div class="flex items-center gap-3">
+      <div class="p-2.5 bg-pink-100 rounded-2xl border-2 border-slate-900 shadow-[2px_2px_0px_rgba(0,0,0,1)]">
+        <i data-lucide="award" class="w-6 h-6 text-pink-600"></i>
+      </div>
+      <div>
+        <h1 class="font-display font-extrabold text-xl md:text-2xl text-slate-900 tracking-tight leading-none">REELSYSTEM</h1>
+        <p class="text-[10px] text-pink-600 font-black uppercase tracking-widest mt-1">Procedural Performance Criteria Sheet Generator</p>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-3">
+      <!-- Language Switcher -->
+      <button id="btn-lang" onclick="toggleLanguage()" class="flex items-center gap-1.5 px-4 py-2 bg-pink-50 hover:bg-pink-100 text-pink-700 rounded-xl border-2 border-slate-900 font-black text-xs uppercase tracking-wider transition-all duration-150 shadow-[2px_2px_0px_rgba(0,0,0,1)] cursor-pointer">
+        <i data-lucide="languages" class="w-4 h-4 text-pink-500"></i>
+        <span id="lbl-lang-toggle">Filipino</span>
+      </button>
+
+      <!-- Print PDF Trigger (Robust Popup) -->
+      <button onclick="printRubric()" class="flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl border-2 border-slate-900 hover:bg-slate-800 active:translate-y-[2px] transition-all duration-150 shadow-[3px_3px_0px_rgba(0,0,0,1)] cursor-pointer">
+        <i data-lucide="printer" class="w-4 h-4 text-pink-300"></i>
+        <span id="lbl-print-top-btn">Print Criteria PDF</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE CONTAINER -->
+  <main class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-start flex-1 mb-8">
+    
+    <!-- LEFT SIDEBAR: PARAMETERS PANEL -->
+    <section class="lg:col-span-5 bg-white border-4 border-slate-900 rounded-3xl p-6 shadow-[5px_5px_0px_rgba(0,0,0,1)] no-print space-y-6">
+      
+      <!-- TITLE / CONFIG HEADER -->
+      <div class="flex justify-between items-center border-b-2 border-slate-100 pb-4">
+        <div class="flex items-center gap-2">
+          <i data-lucide="sliders" class="w-5 h-5 text-pink-600"></i>
+          <h2 class="font-display font-bold text-lg text-slate-900" id="lbl-settings-title">Generator Settings</h2>
+        </div>
+      </div>
+
+      <!-- ACTIVITY SEARCH & QUICK TEMPLATES -->
+      <div class="space-y-3">
+        <label class="block text-[10px] font-black text-slate-700 uppercase tracking-wide mb-1" id="lbl-quick-template">Quick Activity Template</label>
+        <div class="flex gap-2">
+          <select id="select-activity" onchange="loadActivityTemplate(this.value)" class="flex-1 px-3 py-2 bg-pink-50/50 border-2 border-slate-900 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-pink-300">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+      </div>
+
+      <!-- HEADER METADATA INPUTS -->
+      <div class="space-y-4 pt-2 border-t border-slate-100">
+        <h3 class="font-bold text-xs uppercase tracking-wider text-slate-400" id="lbl-header-section">1. Header Information</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-[10px] font-bold text-slate-600 uppercase tracking-wide mb-1" id="lbl-school">School Name</label>
+            <input type="text" id="input-school" value="ReelSystem Academy" class="w-full px-3 py-2 border-2 border-slate-900 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-pink-300" oninput="syncPreview()">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-600 uppercase tracking-wide mb-1" id="lbl-subject">Subject Area</label>
+            <input type="text" id="input-subject" value="Creative Writing" class="w-full px-3 py-2 border-2 border-slate-900 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-pink-300" oninput="syncPreview()">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-[10px] font-bold text-slate-600 uppercase tracking-wide mb-1" id="lbl-task">Performance Task Title / Activity</label>
+            <input type="text" id="input-task" value="Short Story Exposition Rubric" class="w-full px-3 py-2 border-2 border-slate-900 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-pink-300" oninput="handleActivitySearchInput(this.value)">
+            <p class="text-[9px] text-slate-400 mt-1" id="lbl-search-helper">Auto-completes and populates criteria as you type common tasks offline.</p>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-600 uppercase tracking-wide mb-1" id="lbl-grade">Grade / Section</label>
+            <input type="text" id="input-grade" value="Grade 11 - Prose" class="w-full px-3 py-2 border-2 border-slate-900 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-pink-300" oninput="syncPreview()">
+          </div>
+        </div>
+      </div>
+
+      <!-- DYNAMIC CRITERIA BUILDER -->
+      <div class="space-y-4 pt-4 border-t border-slate-100">
+        <div class="flex justify-between items-center">
+          <h3 class="font-bold text-xs uppercase tracking-wider text-slate-400" id="lbl-criteria-section">2. Rubric Criteria Rows</h3>
+          <button onclick="addCriteriaRow()" class="flex items-center gap-1.5 px-3 py-1.5 bg-pink-600 hover:bg-pink-700 text-white rounded-xl border-2 border-slate-900 font-extrabold text-[10px] uppercase tracking-wider transition-all shadow-[2px_2px_0px_rgba(0,0,0,1)] active:translate-y-[1px]">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            <span id="lbl-add-row-btn">+ Add Row</span>
+          </button>
+        </div>
+
+        <!-- Weight Validation Badge -->
+        <div id="weight-badge-container" class="flex justify-center p-2 rounded-xl border-2 border-slate-900 text-xs font-black uppercase tracking-wide">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Dynamic Rows Container -->
+        <div id="criteria-inputs-container" class="space-y-4 max-h-[380px] overflow-y-auto pr-1">
+          <!-- Populated dynamically via JS -->
+        </div>
+
+        <!-- System Reset and Clear -->
+        <div class="flex gap-2 pt-2">
+          <button onclick="clearAllRows()" class="flex-1 py-2 bg-white hover:bg-slate-50 text-slate-800 rounded-xl border-2 border-slate-900 text-xs font-extrabold uppercase transition-all shadow-[2px_2px_0px_rgba(0,0,0,1)] cursor-pointer">
+            <span id="lbl-clear-btn">Clear Sheet</span>
+          </button>
+          <button onclick="resetToDefaultActivity()" class="flex-1 py-2 bg-pink-100 hover:bg-pink-200 text-pink-800 rounded-xl border-2 border-slate-900 text-xs font-extrabold uppercase transition-all shadow-[2px_2px_0px_rgba(0,0,0,1)] cursor-pointer">
+            <span id="lbl-reset-btn">Reset Template</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT PREVIEW CANVAS: LIVE A4 SHEET MOCKUP -->
+    <section class="lg:col-span-7 flex flex-col items-center">
+      <!-- Mini instruction badge -->
+      <div class="w-full max-w-[210mm] mb-4 p-3 bg-pink-100 border-2 border-pink-200 rounded-2xl text-center text-xs font-bold text-pink-900 no-print flex items-center justify-center gap-2 shadow-[2px_2px_0px_rgba(0,0,0,0.05)]">
+        <span>💡</span>
+        <span id="lbl-print-info"><strong>A4 Portrait Print Layout Ready:</strong> Hide browser headers and footers when printing to keep margins clean.</span>
+      </div>
+
+      <!-- The A4 Canvas Mockup Sheet -->
+      <div id="reelsystem-printable-rubric-canvas" class="print-canvas w-full max-w-[210mm] min-h-[297mm] bg-white text-slate-900 p-8 md:p-12 shadow-[0_12px_40px_rgba(0,0,0,0.1)] border-2 border-slate-200 rounded-sm relative flex flex-col justify-between overflow-hidden">
+        
+        <div>
+          <!-- Document Header -->
+          <div class="text-center pb-4 border-b-4 border-double border-slate-900 mb-6 relative">
+            <h1 class="text-xs font-extrabold tracking-widest text-slate-500 uppercase" id="preview-school-top">REELSYSTEM Academy</h1>
+            <h2 class="text-lg md:text-xl font-black text-slate-900 tracking-tight my-1 uppercase" id="preview-task-top">PERFORMANCE TASK RUBRIC CRITERIA SHEET</h2>
+            <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs font-bold text-slate-600 mt-2">
+              <span><span id="lbl-prev-subject">Subject:</span> <strong class="text-slate-900" id="preview-subject-top">English Lit</strong></span>
+              <span>•</span>
+              <span><span id="lbl-prev-grade">Grade:</span> <strong class="text-slate-900" id="preview-grade-top">Grade 11 - Creative</strong></span>
+            </div>
+          </div>
+
+          <!-- Academic Student Metadata Slot -->
+          <div class="grid grid-cols-12 gap-4 mb-6 text-xs">
+            <div class="col-span-6 flex items-center gap-2">
+              <span class="font-bold text-slate-700 whitespace-nowrap" id="lbl-prev-student">Student Name:</span>
+              <div class="flex-1 border-b-2 border-slate-400 h-6"></div>
+            </div>
+            <div class="col-span-3 flex items-center gap-2">
+              <span class="font-bold text-slate-700 whitespace-nowrap" id="lbl-prev-date">Date:</span>
+              <div class="flex-1 border-b-2 border-slate-400 h-6"></div>
+            </div>
+            <div class="col-span-3 flex items-center gap-2">
+              <div class="w-full bg-slate-50 border-2 border-slate-900 rounded-lg p-2 flex justify-between items-center">
+                <span class="font-bold text-slate-700" id="lbl-prev-total">Total:</span>
+                <span class="font-black text-slate-900" id="preview-total-weight">100%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Printable Table Grid -->
+          <div class="overflow-x-auto">
+            <table class="w-full border-collapse text-left border-2 border-slate-900 text-xs">
+              <thead>
+                <tr class="bg-pink-100 border-b-2 border-slate-900">
+                  <th class="p-2 text-[10px] font-black uppercase text-slate-900 border-r-2 border-slate-900 w-[22%] print-bg-shade" id="th-criteria">Criteria & Weight</th>
+                  <th class="p-2 text-[10px] font-black uppercase text-slate-900 border-r border-slate-900 w-[18%]" id="th-excellent">Excellent (4)</th>
+                  <th class="p-2 text-[10px] font-black uppercase text-slate-900 border-r border-slate-900 w-[18%]" id="th-good">Good (3)</th>
+                  <th class="p-2 text-[10px] font-black uppercase text-slate-900 border-r border-slate-900 w-[18%]" id="th-fair">Fair (2)</th>
+                  <th class="p-2 text-[10px] font-black uppercase text-slate-900 border-r border-slate-900 w-[18%]" id="th-poor">Poor (1)</th>
+                  <th class="p-2 text-[10px] font-black uppercase text-slate-900 w-[6%] text-center" id="th-score">Score</th>
+                </tr>
+              </thead>
+              <tbody id="preview-table-body" class="divide-y border-b border-slate-900">
+                <!-- Rows injected dynamically via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- LOWER SIGNATURE BLOCK & CERTIFICATE STAMP -->
+        <div class="mt-8 border-t-2 border-slate-300 pt-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-xs">
+            <div>
+              <span class="font-extrabold text-slate-900 block mb-1 uppercase tracking-wide" id="lbl-prev-signature">Teacher Signature</span>
+              <p class="text-[9px] text-slate-500 mb-6 leading-relaxed" id="lbl-prev-signature-desc">
+                This diagnostic feedback rubric serves as an official performance metric record. Plagiarism, fraud, or duplicated grading is strictly prohibited under institutional policy.
+              </p>
+              <div class="flex flex-col items-center">
+                <div class="w-full max-w-[280px] border-b-2 border-slate-900 h-8 flex items-end justify-center">
+                  <span class="text-[10px] text-slate-400 italic" id="lbl-signature-slot">Signature Line</span>
+                </div>
+                <span class="text-[9px] text-slate-700 font-bold mt-1 uppercase tracking-wider" id="lbl-signature-sub">Assessing Facilitator</span>
+              </div>
+            </div>
+
+            <div class="flex flex-col justify-end items-center md:items-end">
+              <div class="p-3 bg-pink-50 border-2 border-dashed border-pink-400 rounded-xl max-w-[240px] text-center print-bg-shade">
+                <span class="text-[9px] font-black text-slate-500 tracking-wider block uppercase">ReelSystem assessment system</span>
+                <div class="text-[10px] font-black text-pink-700 my-0.5">★ ACCREDITED EVALUATION SHEET ★</div>
+                <span class="text-[8px] text-slate-400" id="lbl-verified-stamp">Verified Standard Template</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Micro branding footer -->
+          <div class="flex justify-between items-center text-[8px] font-black text-slate-400 tracking-wider mt-8 border-t border-slate-100 pt-2 uppercase">
+            <span>Powered by ReelSystem Evaluation Engine</span>
+            <span>Page 1 of 1</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="max-w-7xl mx-auto w-full border-t border-slate-200 pt-4 text-center text-xs font-medium text-slate-500 no-print">
+    <p>© 2026 ReelSystem Suite. All assessment resources are compiled server-side for classroom integrity.</p>
+  </footer>
+
+  <script>
+    // System Translations Map
+    const translations = {
+      en: {
+        settingsTitle: "Generator Settings",
+        langBtn: "Filipino",
+        headerSec: "1. Header Information",
+        criteriaSec: "2. Rubric Criteria Rows",
+        schoolLabel: "School Name",
+        subjectLabel: "Subject Area",
+        taskLabel: "Performance Task Title / Activity",
+        gradeLabel: "Grade / Section",
+        addRowBtn: "+ Add Criteria Row",
+        printInfo: "<strong>A4 Portrait Print Layout Ready:</strong> Hide browser headers and footers when printing to keep margins clean.",
+        thCriteria: "Criteria & Weight",
+        thExcellent: "Excellent (4)",
+        thGood: "Good (3)",
+        thFair: "Fair (2)",
+        thPoor: "Poor (1)",
+        thScore: "Score",
+        prevSubject: "Subject:",
+        prevGrade: "Grade:",
+        prevStudent: "Student Name:",
+        prevDate: "Date:",
+        prevTotal: "Total:",
+        prevSignature: "Teacher Signature",
+        prevSignatureDesc: "This diagnostic feedback rubric serves as an official performance metric record. Plagiarism, fraud, or duplicated grading is strictly prohibited under institutional policy.",
+        signatureSlot: "Signature Line",
+        signatureSub: "Assessing Facilitator",
+        verifiedStamp: "Verified Standard Template",
+        quickTemplate: "Quick Activity Template",
+        printBtn: "Print Criteria PDF",
+        clearBtn: "Clear Sheet",
+        resetBtn: "Reset Template",
+        searchHelper: "Auto-completes and populates criteria as you type common tasks offline."
+      },
+      fil: {
+        settingsTitle: "Mga Setting ng Generator",
+        langBtn: "English",
+        headerSec: "1. Impormasyon ng Header",
+        criteriaSec: "2. Mga Hilera ng Rubrik",
+        schoolLabel: "Pangalan ng Paaralan",
+        subjectLabel: "Asignatura / Kurso",
+        taskLabel: "Pamagat ng Gawain / Aktibidad",
+        gradeLabel: "Baitang / Seksyon",
+        addRowBtn: "+ Magdagdag ng Kraytirya",
+        printInfo: "<strong>Handa para sa A4 Portrait Print:</strong> I-off ang browser headers at footers para sa malinis na kopya.",
+        thCriteria: "Kraytirya at Bigat",
+        thExcellent: "Napakahusay (4)",
+        thGood: "Mahusay (3)",
+        thFair: "Katamtaman (2)",
+        thPoor: "Kailangan ng Sanay (1)",
+        thScore: "Iskor",
+        prevSubject: "Asignatura:",
+        prevGrade: "Baitang:",
+        prevStudent: "Pangalan ng Mag-aaral:",
+        prevDate: "Petsa:",
+        prevTotal: "Kabuuan:",
+        prevSignature: "Lagda ng Guro",
+        prevSignatureDesc: "Ang rubrik na ito ay magsisilbing opisyal na rekord ng pagmamarka. Ang plagiarism, pandaraya, o dobleng lagda ay mahigpit na ipinagbabawal.",
+        signatureSlot: "Linya ng Lagda",
+        signatureSub: "Tagatasa / Guro",
+        verifiedStamp: "Beripikadong Pamantayan",
+        quickTemplate: "Mabilisang Template ng Aktibidad",
+        printBtn: "I-print ang Rubrik",
+        clearBtn: "Burahin Lahat",
+        resetBtn: "I-reset ang Template",
+        searchHelper: "Awtomatikong nilalagyan ang mga kraytirya habang nagta-type ng mga karaniwang aktibidad."
+      }
+    };
+
+    // 20-Activity Bilingual Matrix Database
+    const activityDb = {
+      en: {
+        "Science Lab Experiment": [
+          { name: "Scientific Methodology", weight: 40, excellent: "Hypothesis is clear, variables controlled perfectly, and method followed systematically.", good: "Hypothesis is clear, most variables controlled, systematic steps followed with minor lapses.", fair: "Hypothesis is vague, variables are poorly controlled, methodology is inconsistent.", poor: "No hypothesis, variables uncontrolled, steps followed randomly." },
+          { name: "Data Analysis & Accuracy", weight: 30, excellent: "Data is logged accurately in structured tables, graphs are precise, and analysis is logical.", good: "Data is accurate, graphs are mostly clear, analysis is sound with minor gaps.", fair: "Data is incomplete, graphs lack labels, analysis is superficial.", poor: "Data is missing or falsified, no analysis provided." },
+          { name: "Safety & Lab Hygiene", weight: 30, excellent: "Followed all safety protocols, maintained pristine hygiene, and restored equipment.", good: "Followed safety protocols, minor untidiness in workstation, equipment returned.", fair: "Neglected some minor safety procedures, workstation left messy.", poor: "Pervasive safety violations, equipment left uncleaned or damaged." }
+        ],
+        "Oral Presentation": [
+          { name: "Delivery & Elocution", weight: 40, excellent: "Maintained steady eye contact, spoke clearly with dynamic modulation, and showed high confidence.", good: "Good eye contact, clear voice, occasional minor pacing hitches or filler words.", fair: "Limited eye contact, reads frequently from slides, voice lacks volume or variance.", poor: "Mumbles, reads entirely from script, lacks audience engagement." },
+          { name: "Content & Structure", weight: 40, excellent: "Arguments are highly persuasive, organized logically, and supported by rich evidence.", good: "Topic is well explained, structure is logical with minor pacing flaws.", fair: "Arguments lack depth, poor structure, limited evidence provided.", poor: "Disorganized, lacks factual basis, content is irrelevant." },
+          { name: "Visual Aids", weight: 20, excellent: "Slides/props are visually stunning, uncluttered, and elevate the presentation impact.", good: "Slides are clean and legible with minor layout clutter.", fair: "Slides are text-heavy, difficult to read, or minimally utilized.", poor: "Slides are chaotic, distracting, or not used at all." }
+        ],
+        "Role-play Drama": [
+          { name: "Characterization", weight: 40, excellent: "Immersive portrayal, sustained accent/mannerisms, and outstanding emotional range.", good: "Convincing portrayal, minor lapses in sustaining character depth.", fair: "Acting is stiff, lacks emotional expression, occasionally breaks character.", poor: "Monotone reading, no character connection, breaks character constantly." },
+          { name: "Collaboration", weight: 30, excellent: "Flawless chemistry with cast, active listening, and balanced scene timing.", good: "Good coordination with team, minor timing or spacing hitches.", fair: "Uncoordinated interactions, speaks over peers, or lacks focus.", poor: "No collaboration, ignores team members, disrupts the performance." },
+          { name: "Creative Impact", weight: 30, excellent: "Script is original, prop usage is highly creative, and theme is deeply impactful.", good: "Story is engaging, prop usage is appropriate, theme is clear.", fair: "Simplistic plot, minimal props, theme is superficial.", poor: "Chaotic plot, no effort in creative set design or thematic delivery." }
+        ],
+        "Poster Making": [
+          { name: "Visual Design & Composition", weight: 40, excellent: "Layout is perfectly balanced, colors are eye-catching, and negative space is masterfully utilized.", good: "Layout is clean, colors are appealing with minor spacing clutter.", fair: "Layout is unbalanced, colors clash, or space is poorly utilized.", poor: "Chaotic layout, messy execution, lack of visual effort." },
+          { name: "Thematic Relevance", weight: 40, excellent: "Thematic message is immediate, highly persuasive, and exceptionally profound.", good: "Message is clear and relevant to the assigned topic.", fair: "Message is vague, simplistic, or tangentially related.", poor: "Message is confusing, irrelevant, or entirely missing." },
+          { name: "Craftsmanship & Neatness", weight: 20, excellent: "Impeccable execution, clean lines, zero smudge marks or structural damage.", good: "Clean execution with fewer than two minor smudges or pencil lines.", fair: "Work has noticeable smudge marks, loose details, or slight tearing.", poor: "Work is highly untidy, torn, or severely smudged." }
+        ],
+        "Debate": [
+          { name: "Argumentation & Evidence", weight: 40, excellent: "Claims are backed by robust empirical evidence, and logical fallacies are completely absent.", good: "Arguments are logical and supported by credible evidence with minor gaps.", fair: "Claims are superficial, relying on anecdote rather than solid proof.", poor: "Disorganized claims, factual falsehoods, or irrational fallacies." },
+          { name: "Rebuttal & Responsiveness", weight: 40, excellent: "Directly neutralized opponent's arguments with instant, laser-focused counter-evidence.", good: "Addresses opponent's main points with reasonable counter-arguments.", fair: "Rebuttals are weak, repetitive, or partially dodge the arguments.", poor: "Ignores opponent's claims entirely, or responds with ad hominem remarks." },
+          { name: "Demeanor & Rhetoric", weight: 20, excellent: "Outstanding poise, professional tone, and highly elegant persuasive rhetoric.", good: "Professional demeanor and clear communication with minor pacing slips.", fair: "Poise lapses under pressure, tone is defensive, or voice is monotone.", poor: "Unprofessional conduct, interrupts peers, or speaks aggressively." }
+        ],
+        "Math Problem Solving": [
+          { name: "Conceptual Understanding", weight: 40, excellent: "Masterful application of mathematical principles, selecting the most efficient formulas.", good: "Correct principles and formulas selected with minor application slips.", fair: "Misinterpreted parts of the problem, leading to wrong formula choices.", poor: "No understanding of mathematical principles shown; formulas are random." },
+          { name: "Procedural Accuracy", weight: 40, excellent: "Step-by-step calculations are completely flawless, with elegant algebraic proofs.", good: "Steps are logical and mostly correct, with minor arithmetic errors.", fair: "Pervasive calculation errors, though the general methodology is correct.", poor: "Incomprehensible steps, zero calculation logic, wrong final answers." },
+          { name: "Explanation & Notation", weight: 20, excellent: "Every variable is explicitly defined, and notation is mathematically flawless.", good: "Notation is correct, and steps are generally well explained.", fair: "Notation is sloppy, or steps are missing explanations.", poor: "No notations or explanation provided; only raw numbers shown." }
+        ],
+        "Essay Writing": [
+          { name: "Thesis & Development", weight: 40, excellent: "Thesis is provocative and clear. Body paragraphs explore deep insights with persuasive evidence.", good: "Thesis is clear and well-supported by mostly convincing arguments.", fair: "Thesis is simplistic or vague. Arguments are predictable and repetitive.", poor: "No clear thesis. Content is highly disorganized and superficial." },
+          { name: "Organization & Structure", weight: 30, excellent: "Introduction is captivating. Seamless transition between points, ending in a profound conclusion.", good: "Logical layout with an intro, body, and conclusion with minor pacing glitches.", fair: "Transitions are clunky, or paragraphs are unevenly structured.", poor: "Lacks structural logic, making the text extremely difficult to follow." },
+          { name: "Style & Mechanics", weight: 30, excellent: "Rich vocabulary, varied sentence lengths, and absolutely zero grammatical slip-ups.", good: "Clear writing with sophisticated choices and under three minor errors.", fair: "Simplistic vocabulary with frequent minor punctuation or spelling mistakes.", poor: "Severe grammatical issues severely obscure the essay's core message." }
+        ],
+        "Slogan Making": [
+          { name: "Wordplay & Impact", weight: 40, excellent: "Slogan is exceptionally catchy, using rhyme or clever puns to leave a lasting impact.", good: "Slogan is clear, memorable, and well phrased.", fair: "Slogan is cliché, wordy, or lacks persuasive rhythm.", poor: "Slogan is confusing, dull, or copies existing work directly." },
+          { name: "Relevance to Theme", weight: 40, excellent: "Flawlessly encapsulates the core message of the event in a single punchline.", good: "Relevant to the theme and communicates the core idea effectively.", fair: "Tangentially related to the theme, message is partially obscure.", poor: "No relevance to the theme or message is completely lost." },
+          { name: "Visual Layout", weight: 20, excellent: "Perfect placement of words, elegant typography, and highly professional lettering.", good: "Lettering is neat, legible, and spaced reasonably well.", fair: "Sloppy lettering or cramped spacing makes the slogan hard to read.", poor: "Unreadable text, extremely sloppy alignment, or incomplete work." }
+        ],
+        "Coding / Programming Lab": [
+          { name: "Logic & Algorithm Efficiency", weight: 40, excellent: "Code utilizes optimal data structures and algorithms, avoiding redundant execution loops.", good: "Algorithm is correct and works fine, with minor efficiency gaps.", fair: "Code contains redundant logic, or is unnecessarily convoluted.", poor: "Algorithm is completely broken, leading to stack overflows or wrong outputs." },
+          { name: "Clean Code & Style", weight: 30, excellent: "Impeccable variable naming, consistent indentation, and comprehensive inline comments.", good: "Clean code with minor naming inconsistencies or sparse comments.", fair: "Messy formatting, confusing names, and zero comments.", poor: "Incomprehensible spaghetti code, zero formatting standards followed." },
+          { name: "Testing & Validation", weight: 30, excellent: "Zero compilation warnings, passes all unit tests, and handles edge cases perfectly.", good: "Code compiles successfully, passes main test cases, minor edge case slips.", fair: "Compiles but crashes on minor edge cases, or contains some syntax warnings.", poor: "Fails to compile entirely, or crashes instantly on run." }
+        ],
+        "Group Discussion": [
+          { name: "Active Contribution", weight: 40, excellent: "Shared deep analytical insights, asked thought-provoking questions, and drove dialogue.", good: "Contributed constructive ideas and participated actively in discussions.", fair: "Passive participant, only speaks when prompted, limited input.", poor: "Completely disengaged, distracted, or refused to participate." },
+          { name: "Active Listening & Respect", weight: 30, excellent: "Validated peers' points, integrated team ideas, and showed exceptional empathy.", good: "Showed respect, listened attentively, and collaborated cordially.", fair: "Interrupted peers occasionally, or ignored constructive suggestions.", poor: "Disrespectful, spoke over team members, or created hostile tension." },
+          { name: "Synthesis & Outcomes", weight: 30, excellent: "Summarized group viewpoints flawlessly and helped drive the team to a solid consensus.", good: "Helped formulate team ideas and compile the final summary.", fair: "Struggled to synthesize group ideas, or summary is incomplete.", poor: "Failed to achieve group goals, leaving discussions completely scattered." }
+        ],
+        "Musical Performance": [
+          { name: "Technical Precision", weight: 40, excellent: "Flawless pitch, perfect rhythm, and impeccable control over tempo and phrasing.", good: "Very good technique with minor slips in pitch or timing.", fair: "Noticeable pitch errors, inconsistent tempo, or rigid phrasing.", poor: "Off-key, chaotic rhythm, completely out of sync with the piece." },
+          { name: "Expressive Artistry", weight: 30, excellent: "Dynamic contrast is highly dramatic, conveying deep emotional nuances.", good: "Dynamic variation is evident, showing very good musicality.", fair: "Flat dynamics, lacks emotional expression, performance feels mechanical.", poor: "No dynamic control, flat delivery, completely devoid of artistic intent." },
+          { name: "Stage Presence", weight: 30, excellent: "Commanding poise, absolute focus, and highly engaging performance charisma.", good: "Professional stage deportment, good confidence, and focus.", fair: "Visible nervousness, minor posture slips, or slight loss of focus.", poor: "Severe stage fright, stops mid-performance, or lacks professional conduct." }
+        ],
+        "Historical Timeline Crafting": [
+          { name: "Chronological Accuracy", weight: 40, excellent: "All dates and events are perfectly accurate, tracing a flawless historical narrative.", good: "All major dates are correct, with minor omissions of auxiliary details.", fair: "Contains a few chronological sequencing errors or mislabeled events.", poor: "Pervasive dating errors, events are placed out of order, or inaccurate." },
+          { name: "Historical Depth & Content", weight: 40, excellent: "Explains the deep socio-political causes and effects of each historical event.", good: "Explains the main context and outcomes of events clearly.", fair: "Descriptions of events are highly simplistic or lack historical context.", poor: "Only lists raw dates and names without any historical explanation." },
+          { name: "Visual Mechanics", weight: 20, excellent: "Stunning hand-drawn/printed graphics, elegant spacing, and pristine timeline layout.", good: "Timeline is clean, readable, with well-distributed graphic elements.", fair: "Timeline is cluttered, hard to follow, or graphics are sparse.", poor: "Messy, unorganized scribbles on a line with zero visual care." }
+        ],
+        "Physical Education Drill": [
+          { name: "Motor Coordination", weight: 40, excellent: "Movement execution is highly fluid, showing masterful balance, speed, and agility.", good: "Good coordination and balance, with minor slips in physical execution.", fair: "Stiff movements, visible struggles with coordination or balance.", poor: "Completely uncoordinated, fails to perform physical movements safely." },
+          { name: "Rhythm & Synchronization", weight: 40, excellent: "Maintained perfect synchronization with the drill music beats and peers.", good: "Maintained rhythm with very minor deviations in timing.", fair: "Frequently off-beat, struggling to synchronize with music or peers.", poor: "No rhythm, ignores music cues, completely out of sync." },
+          { name: "Stamina & Effort", weight: 20, excellent: "Sustained intense physical effort, showing peak athletic form throughout.", good: "Shows very good effort and stamina, completing the drill smoothly.", fair: "Fatigues quickly, shows hesitant effort, or breaks drill sequences.", poor: "Minimal physical effort, refuses to try, or quits drill early." }
+        ],
+        "Art Portfolio": [
+          { name: "Creative Originality", weight: 40, excellent: "Artworks show a highly unique, distinctive voice, breaking artistic conventions.", good: "Artworks are highly expressive, showing very good creative choices.", fair: "Artworks copy existing styles, lacking individual artistic risk.", poor: "No originality, works feel like uninspired trace-overs or replicas." },
+          { name: "Technical Skill", weight: 40, excellent: "Masterful control over medium (shading, brushwork, sculpting, or digital tool).", good: "Strong technique with very clean shading and balanced color values.", fair: "Developing technique, lines are a bit shaky, shading lacks depth.", poor: "Poor technique, messy execution, lack of medium control." },
+          { name: "Thematic Cohesion", weight: 20, excellent: "A powerful, unified conceptual theme binds all artworks in the portfolio.", good: "An apparent theme links most of the pieces in the portfolio.", fair: "Theme is loose, inconsistent, or weakly explained in the artist notes.", poor: "Artworks are random, with zero conceptual link or thematic depth." }
+        ],
+        "Book Review": [
+          { name: "Analytical Depth", weight: 40, excellent: "Explores deep subtextual themes, character psychology, and authorial motifs.", good: "Provides a very good analysis of the plot, characters, and main themes.", fair: "Analysis is limited to basic plot summary rather than thematic critique.", poor: "No analysis provided; only a superficial list of events in the book." },
+          { name: "Critique & Evaluation", weight: 40, excellent: "Constructive evaluation of author's style, backed by specific textual citations.", good: "Clear critique of the book supported by general examples.", fair: "Critique is vague, consisting of 'like/dislike' without justification.", poor: "No evaluation or critical assessment of the book is present." },
+          { name: "Structure & Cohesion", weight: 20, excellent: "Captivating intro, seamless argumentative paragraphs, and profound conclusion.", good: "Structured clearly with clear transition flows and robust conclusion.", fair: "Transitions are rough, making the critique difficult to read.", poor: "Completely disorganized paragraphs with zero flow." }
+        ]
+      },
+      fil: {
+        "Science Lab Experiment": [
+          { name: "Siyentipikong Pamamaraan", weight: 40, excellent: "Malinaw at tumpak ang hinuha (hypothesis), kontrolado ang lahat ng variable, at sistematiko ang hakbang.", good: "Malinaw ang hinuha, kontrolado ang karamihan sa variable, maayos ang hakbang.", fair: "Malabo ang hinuha, hindi gaanong kontrolado ang variable, may gulo sa hakbang.", poor: "Walang hinuha, hindi kontrolado ang variable, magulo at walang direksyon." },
+          { name: "Suri at Kawastuhan ng Datos", weight: 30, excellent: "Tumpak ang pagtatala ng datos sa mga talahanayan, malinaw ang tsart, at lohikal ang pagsusuri.", good: "Tumpak ang datos, maayos ang karamihan sa tsart, may lohikal na pagsusuri.", fair: "Kulang ang datos, walang label ang mga tsart, mababaw ang pagsusuri.", poor: "Mali o imbento ang datos, walang pagsusuring ginawa." },
+          { name: "Kaligtasan at Kalinisan", weight: 30, excellent: "Sumunod sa lahat ng protokol sa kaligtasan, malinis ang laboratoryo, at inayos ang kagamitan.", good: "Sumunod sa kaligtasan, may kaunting dumi sa workspace, ibinalik ang kagamitan.", fair: "May nakalimutang ilang hakbang sa kaligtasan, medyo madumi ang workspace.", poor: "Hindi sumunod sa kaligtasan, madumi ang workspace, ibinalik ang kagamitan nang marumi o may sira." }
+        ],
+        "Oral Presentation": [
+          { name: "Paglalahad at Tinig", weight: 40, excellent: "May tiwala sa sarili, malinaw at may tamang modulation ang tinig, at may eye contact.", good: "Maayos ang eye contact, malinaw ang tinig, may kaunting pag-aalangan.", fair: "Limitado ang eye contact, madalas magbasa sa slide, mahina ang boses.", poor: "Pabulong kung magsalita, binabasa lang ang script, walang pakikipag-ugnayan." },
+          { name: "Nilalaman at Estruktura", weight: 40, excellent: "Lubhang mapanghikayat ang mga argumento, lohikal ang daloy, at may sapat na ebidensya.", good: "Malinaw ang pagpapaliwanag, lohikal ang estruktura ngunit may kaunting bagal.", fair: "Mababaw ang argumento, kulang sa ebidensya, magulo ang daloy.", poor: "Walang kaayusan, walang katotohanan ang inilahad, walang kaugnayan." },
+          { name: "Kagamitang Biswal", weight: 20, excellent: "Napakaganda at malikhain ng mga slide/kagamitan, hindi siksik sa teksto, at nakakatulong sa pagkatuto.", good: "Malinis at madaling basahin ang mga slide, may kaunting siksik na teksto.", fair: "Masyadong maraming teksto sa slides, mahirap basahin, o hindi nagamit nang maayos.", poor: "Magulo ang slides, nakakaabala sa nakikinig, o walang biswal na ginamit." }
+        ],
+        "Role-play Drama": [
+          { name: "Pagsasabuhay ng Karakter", weight: 40, excellent: "Napakasining na pagganap, tumpak ang pananalita at galaw, at may mataas na emosyon.", good: "Kapani-paniwala ang pagganap, may kaunting lapses sa emosyon.", fair: "Matigas ang pag-arte, walang emosyon, madalas lumabas sa karakter.", poor: "Walang buhay na pagbasa, hindi ramdam ang karakter, laging lumalabas sa karakter." },
+          { name: "Kooperasyon ng Pangkat", weight: 30, excellent: "May mahusay na ugnayan sa kapwa artista, nakikinig, at sakto ang timing sa entablado.", good: "Maayos ang ugnayan, may kaunting problema sa timing o pwesto.", fair: "Hindi gaanong nag-uusap sa entablado, nag-aagawan ng linya, o walang pokus.", poor: "Walang pakikipagtulungan, pinababayaan ang kasamahan, sinisira ang dula." },
+          { name: "Malikhaing Impak", weight: 30, excellent: "Orihinal ang script, malikhain ang paggamit ng props, at malalim ang mensahe ng dula.", good: "Kagiliw-giliw ang kwento, angkop ang props, malinaw ang mensahe.", fair: "Masyadong simple ang kwento, kulang sa props, mababaw ang tema.", poor: "Magulo ang kwento, walang props na ginamit, walang tema o mensahe." }
+        ],
+        "Poster Making": [
+          { name: "Disenyo at Komposisyon", weight: 40, excellent: "Perpekto ang balanse ng layout, kaakit-akit ang kulay, at mahusay ang paggamit ng espasyo.", good: "Malinis ang layout, maganda ang kulay ngunit may kaunting siksik na espasyo.", fair: "Hindi balanse ang layout, masakit sa mata ang kulay, kulang sa ayos.", poor: "Napakagulo ng layout, madumi ang pagkakagawa, walang sining." },
+          { name: "Kaugnayan sa Tema", weight: 40, excellent: "Napakalinaw at mabilis maunawaan ang mensahe, at lubhang mapanghikayat.", good: "Malinaw at may kaugnayan ang mensahe sa ibinigay na paksa.", fair: "Medyo malabo ang mensahe, o hindi gaanong kaugnay sa paksa.", poor: "Walang kaugnayan ang mensahe sa tema o ganap na nawawala." },
+          { name: "Kalinisan at Paggawa", weight: 20, excellent: "Napakalinis ng pagkakagawa, walang anumang dumi o bura, at walang punit.", good: "Malinis ang gawa, may kaunting bakas ng lapis o bura.", fair: "May mga dumi o bura na nakikita, medyo nagusot ang papel.", poor: "Madumi, lukot-lukot, may punit, at mukhang hindi tinapos." }
+        ],
+        "Debate": [
+          { name: "Pangangatwiran at Katibayan", weight: 40, excellent: "Ang mga argumento ay may matibay na ebidensya, at walang anumang lohikal na kamalian.", good: "Lohikal ang argumento at may kredibleng ebidensya ngunit may kaunting kulang.", fair: "Mababaw ang katibayan, umaasa lamang sa opinyon kaysa sa katotohanan.", poor: "Walang kaayusan ang argumento, mali ang mga impormasyon, o walang lohika." },
+          { name: "Pagtuligsa at Pagtugon", weight: 40, excellent: "Mabilis at tumpak na nasagot ang argumento ng kabilang panig gamit ang matibay na katotohanan.", good: "Nasagot ang pangunahing punto ng kalaban gamit ang maayos na katwiran.", fair: "Mahina ang pagtuligsa, paulit-ulit ang punto, o iniwasan ang tanong.", poor: "Hindi pinansin ang argumento ng kalaban, o sumagot nang pabalas." },
+          { name: "Kilos at Pananalita", weight: 20, excellent: "May mataas na antas ng propesyonalismo, kalmado ang kilos, at napakahusay ng retorika.", good: "Propesyonal ang kilos at malinaw ang pananalita na may kaunting kaba.", fair: "Nawalan ng kalmado sa ilalim ng presyur, nagtatanggol, o monotone.", poor: "Walang respeto sa kapwa, nang-iistorbo, o nagsasalita nang pagalit." }
+        ],
+        "Math Problem Solving": [
+          { name: "Pag-unawa sa Konsepto", weight: 40, excellent: "Prinsipyo ng matematika ay naintindihang lubos, pinili ang pinakamabilis na pormula.", good: "Tama ang prinsipyo at pormulang napili na may kaunting kakulangan sa paliwanag.", fair: "Mali ang ilang bahagi ng pagsusuri na humantong sa maling pormula.", poor: "Walang pag-unawa sa konsepto ng matematika; hula-hula ang pormula." },
+          { name: "Kawastuhan ng Hakbang", weight: 40, excellent: "Walang anumang mali sa bawat hakbang ng kalkulasyon, may eleganteng patunay.", good: "Maayos at halos tama ang mga hakbang, may maliit na pagkakamali sa aritmetika.", fair: "Maraming mali sa kalkulasyon, kahit na tama ang pangkalahatang pamamaraan.", poor: "Magulo ang mga hakbang, walang lohika ang kalkulasyon, mali ang sagot." },
+          { name: "Paliwanag at Notasyon", weight: 20, excellent: "Malinaw na ipinaliwanag ang bawat variable at perpekto ang mathematical notation.", good: "Tama ang notasyon, at maayos na ipinaliwanag ang karamihan sa mga hakbang.", fair: "Magulo ang notasyon, o kulang sa paliwanag ang mga hakbang.", poor: "Walang notasyon o paliwanag; puro numero lamang ang nakasulat." }
+        ],
+        "Essay Writing": [
+          { name: "Tesis at Nilalaman", weight: 40, excellent: "Napakalinaw at malalim ng pangunahing tesis. Mayaman sa ebidensya at pagsusuri ang mga talata.", good: "Malinaw ang tesis at may sapat na suportang argumento at katotohanan.", fair: "Mababaw o malabo ang tesis. Paulit-ulit ang mga argumento.", poor: "Walang tesis. Magulo ang nilalaman at walang lalim ang talakay." },
+          { name: "Organisasyon at Estruktura", weight: 30, excellent: "Kagiliw-giliw ang panimula. Napaka-smooth ng transisyon, at may malalim na kongklusyon.", good: "Lohikal ang pagkakaayos na may panimula, katawan, at wakas.", fair: "Magulo ang mga transisyon, o hindi pantay ang pagkakabuo ng mga talata.", poor: "Walang kaayusan ang estruktura, napakahirap basahin at intindihin." },
+          { name: "Estilo at Gramatika", weight: 30, excellent: "Mayaman ang bokabularyo, may iba't ibang haba ng pangungusap, at walang mali sa gramatika.", good: "Malinaw ang pagsulat, maayos ang bokabularyo, may kulang sa 3 maliit na bantas.", fair: "Simple ang bokabularyo, madalas ang mali sa baybay at bantas.", poor: "Maraming mali sa gramatika na sumisira sa pag-unawa sa buong sanaysay." }
+        ],
+        "Slogan Making": [
+          { name: "Tugma at Impak", weight: 40, excellent: "Napakadaling tandaan ng slogan, gumamit ng tugma o matalinong salita para sa malakas na impak.", good: "Malinaw, madaling tandaan, at maayos ang pagkakabuo ng slogan.", fair: "Gasgas na ang slogan, masyadong mahaba, o walang indayog ang salita.", poor: "Magulo ang slogan, walang buhay, o nangopya lamang sa iba." },
+          { name: "Kaugnayan sa Tema", weight: 40, excellent: "Perpektong naibuod ang mensahe ng okasyon sa isang maikling linya lamang.", good: "May kaugnayan sa tema at epektibong naipahayag ang pangunahing ideya.", fair: "Bahagyang may kaugnayan, hindi gaanong malinaw ang mensahe.", poor: "Walang kaugnayan sa tema o ganap na nawawala ang mensahe." },
+          { name: "Biswal na Layout", weight: 20, excellent: "Perpekto ang pagkakasulat ng mga salita, maganda ang sulat-kamay, at propesyonal ang anyo.", good: "Malinis ang pagkakasulat, madaling basahin, at maayos ang agwat.", fair: "Magulo ang sulat o siksik ang mga letra na nagpapahirap sa pagbasa.", poor: "Hindi mabasa ang teksto, napakadumi ng layout, o hindi tinapos." }
+        ],
+        "Coding / Programming Lab": [
+          { name: "Lohika at Episyensya", weight: 40, excellent: "Gumamit ng pinakamainam na data structure at algorithm, walang redundant na loop.", good: "Tama ang algorithm at gumagana nang maayos, may kaunting kakulangan sa bilis.", fair: "May redundant na lohika ang code, o hindi kailangang kumplikado.", poor: "Sira ang algorithm, nagdudulot ng crash o maling output." },
+          { name: "Kalinisan ng Code", weight: 30, excellent: "Napakaayos ng pangalan ng variable, may tamang indentation, at may sapat na paliwanag (comments).", good: "Malinis ang code na may kaunting hindi tugmang pangalan o kulang sa comments.", fair: "Magulo ang pagkaka-format, walang kaayusan ang pangalan, at walang comments.", poor: "Spaghetti code, walang format, napakahirap intindihin." },
+          { name: "Pagsubok at Pagpapatakbo", weight: 30, excellent: "Walang compilation warning, pumasa sa lahat ng unit test, at walang crash sa edge cases.", good: "Matagumpay na nag-compile, pumasa sa pangunahing test cases, may kaunting kulang sa edge cases.", fair: "Nag-compile ngunit nagka-crash sa edge cases, o may syntax warnings.", poor: "Hindi nag-compile, o nagka-crash agad sa simula." }
+        ],
+        "Group Discussion": [
+          { name: "Aktibong Pakikilahok", weight: 40, excellent: "Nagbahagi ng malalim na pagsusuri, nagtanong ng makabuluhan, at pinangunahan ang usapan.", good: "Nagbahagi ng magagandang ideya at aktibong nakilahok sa talakayan.", fair: "Pasibong nakilahok, nagsasalita lamang kapag tinatanong, limitado ang input.", poor: "Ganap na walang pakialam, abala sa iba, o tumangging makilahok." },
+          { name: "Pakikinig at Respeto", weight: 30, excellent: "Binigyang-halaga ang opinyon ng iba, pinagsama ang mga ideya, at nagpakita ng mataas na empatiya.", good: "May respeto sa kapwa, nakikinig nang mabuti, at maayos na nakikipagtulungan.", fair: "Sumisingit paminsan-sensan, o hindi pinapansin ang mungkahi ng iba.", poor: "Walang respeto, sumasapaw sa kasamahan, o nagdulot ng gulo sa pangkat." },
+          { name: "Sintesis at Output", weight: 30, excellent: "Maayos na naibuod ang lahat ng pananaw at tumulong sa pagbuo ng matibay na desisyon.", good: "Tumulong sa pag-compile ng mga ideya ng pangkat at pagbuo ng buod.", fair: "Nahirapang pag-isahin ang ideya, o kulang ang huling buod.", poor: "Walang nabuong desisyon o output ang pangkat, magulo ang talakayan." }
+        ],
+        "Musical Performance": [
+          { name: "Teknikal na Kahusayan", weight: 40, excellent: "Perpekto ang tono (pitch), ritmo, at kontrol sa tempo at bawat bahagi ng kanta.", good: "Maganda ang teknik na may kaunting maliit na slip sa pitch o ritmo.", fair: "May mga malinaw na mali sa pitch, hindi pare-pareho ang bilis ng kanta.", poor: "Wala sa tono, magulo ang ritmo, hindi sumasabay sa kanta." },
+          { name: "Masining na Pagpapahayag", weight: 30, excellent: "Napakalinaw ng emosyon at dinamiko, ramdam ang lalim ng interpretasyon.", good: "Maayos ang pagbabago sa lakas at hina, nagpakita ng magandang musikalidad.", fair: "Walang dinamiko, walang emosyon ang pagtugtog, masyadong mekanikal.", poor: "Walang kontrol sa lakas, patay ang pagganap, walang sining." },
+          { name: "Presensya sa Entablado", weight: 30, excellent: "May mataas na kumpiyansa, nakatutok sa pagganap, at nakakaakit sa mga manonood.", good: "Propesyonal ang kilos sa entablado, may kumpiyansa at pokus.", fair: "Bakasin ang kaba, may kaunting mali sa tindig, o bahagyang nawalan ng pokus.", poor: "Sobra ang kaba, huminto sa gitna, o walang propesyonal na kilos." }
+        ],
+        "Historical Timeline Crafting": [
+          { name: "Kawastuhan ng Kronolohika", weight: 40, excellent: "Tumpak ang lahat ng petsa at pangyayari, nagpapakita ng malinaw na kasaysayan.", good: "Tama ang lahat ng pangunahing petsa, may kaunting kulang sa mga detalye.", fair: "May ilang mali sa pagkakasunod-sunod ng mga petsa o pangyayari.", poor: "Maraming mali sa petsa, magulo ang pagkakasunod-sunod, o hindi totoo." },
+          { name: "Lalim at Nilalaman", weight: 40, excellent: "Naipaliwanag ang sanhi at bunga ng bawat makasaysayang pangyayari.", good: "Naipaliwanag nang maayos ang konteksto at bunga ng mga pangyayari.", fair: "Masyadong simple ang paliwanag o walang kontekstong pangkasaysayan.", poor: "Puro petsa at pangalan lamang ang nakasulat, walang paliwanag." },
+          { name: "Biswal at Kaayusan", weight: 20, excellent: "Napakaganda ng mga guhit/larawan, maayos ang pagitan, at malikhain ang linya ng panahon.", good: "Malinis ang timeline, madaling basahin, at may maayos na mga larawan.", fair: "Magulo ang timeline, mahirap sundan, o kulang sa mga larawan.", poor: "Sulat-kamay na magulo sa ibabaw ng linya na walang kaayusan." }
+        ],
+        "Physical Education Drill": [
+          { name: "Koordinasyon ng Katawan", weight: 40, excellent: "Napakaliksi at swabe ng mga galaw, nagpapakita ng perpektong balanse at liksi.", good: "Maayos ang koordinasyon at balanse na may kaunting slip sa galaw.", fair: "Matigas ang katawan, halatang nahihirapan sa koordinasyon at galaw.", poor: "Walang koordinasyon, hindi magawa ang galaw nang ligtas." },
+          { name: "Ritmo at Pagsasabay", weight: 40, excellent: "Perpektong sumabay sa indayog ng musika at sa kilos ng mga kasamahan.", good: "Sumabay naman sa ritmo na may kaunting huli sa ilang galaw.", fair: "Madalas na wala sa ritmo, nahihirapang sumabay sa musika o sa pangkat.", poor: "Walang ritmo, hindi pinapansin ang musika, magulo ang galaw." },
+          { name: "Lakas at Pagsisikap", weight: 20, excellent: "Nagpakita ng mataas na antas ng lakas at stamina sa buong drill.", good: "Nagpakita ng maayos na lakas at stamina, natapos ang drill nang maayos.", fair: "Madaling napagod, walang gaanong pagsisikap, o huminto sa paggalaw.", poor: "Walang lakas na ipinakita, tumangging gumalaw, o sumuko agad." }
+        ],
+        "Art Portfolio": [
+          { name: "Orihinalidad at Sining", weight: 40, excellent: "Nagpapakita ng natatangi at sariling boses sa sining, lumalagpas sa karaniwan.", good: "May magandang ekspresyon, nagpapakita ng maayos na pagpili sa sining.", fair: "Nangongopya lamang ng ibang istilo, walang sariling lakas ng paglikha.", poor: "Walang orihinalidad, mukhang trace-over o kopya lamang." },
+          { name: "Teknikal na Kasanayan", weight: 40, excellent: "Napakahusay na kontrol sa medium (shading, pagpipinta, paglilok, o digital).", good: "Maayos ang teknik, malinis ang shading at balanse ang mga kulay.", fair: "Nagsisimula pa lamang, medyo nanginginig ang linya, walang lalim ang shading.", poor: "Mahina ang teknik, madumi ang gawa, walang kontrol sa medium." },
+          { name: "Pagkakaugnay ng Tema", weight: 20, excellent: "May matibay at nag-iisang konsepto na nag-uugnay sa lahat ng gawa sa portfolio.", good: "May malinaw na tema na nag-uugnay sa karamihan sa mga gawa.", fair: "Malabo ang tema, hindi magkakaugnay ang mga gawa sa portfolio.", poor: "Random ang mga gawa, walang konsepto o ugnayan sa isa't isa." }
+        ],
+        "Book Review": [
+          { name: "Lalim ng Pagsusuri", weight: 40, excellent: "Suri ang mga malalalim na tema, sikolohiya ng karakter, at estilo ng may-akda.", good: "Maayos na pagsusuri sa kwento, tauhan, at pangunahing tema.", fair: "Buod lamang ng kwento ang isinulat kaysa sa pagsusuri ng tema.", poor: "Walang pagsusuri, puro buod lamang ng mga pangyayari ang nakasulat." },
+          { name: "Puna at Pagtatasa", weight: 40, excellent: "Nakabubuo ng punang nakakatulong tungkol sa estilo ng may-akda gamit ang mga sipi.", good: "Maayos na puna na may pangkalahatang ebidensya mula sa aklat.", fair: "Vague ang puna, puro 'gusto ko/hindi ko gusto' lamang na walang paliwanag.", poor: "Walang puna o kritikal na pagtatasa sa aklat." },
+          { name: "Estruktura at Daloy", weight: 20, excellent: "Kagiliw-giliw ang simula, lohikal ang bawat talata, at may malalim na wakas.", good: "Maayos ang pagkakaayos na may malinaw na transisyon at wakas.", fair: "Magulo ang transisyon na nagpapahirap sa pagbasa ng puna.", poor: "Walang kaayusan ang bawat talata, walang direksyon ang pagsulat." }
+        ]
+      }
+    };
+
+    let currentLang = "en";
+    let activeRows = [];
+    let selectedActivityKey = "Science Lab Experiment";
+
+    // Initialize application
+    function init() {
+      currentLang = "en";
+      populateActivityDropdown();
+      loadActivityTemplate("Science Lab Experiment");
+      syncPreview();
+      lucide.createIcons();
+    }
+
+    // Populate drop down selector
+    function populateActivityDropdown() {
+      const dropdown = document.getElementById("select-activity");
+      dropdown.innerHTML = "";
+      
+      const keys = Object.keys(activityDb[currentLang]);
+      keys.forEach(key => {
+        const option = document.createElement("option");
+        option.value = key;
+        option.innerText = key;
+        dropdown.appendChild(option);
+      });
+    }
+
+    // Load template
+    function loadActivityTemplate(activityName) {
+      selectedActivityKey = activityName;
+      const data = activityDb[currentLang][activityName];
+      if (data) {
+        activeRows = JSON.parse(JSON.stringify(data));
+        document.getElementById("input-task").value = activityName;
+      }
+      document.getElementById("select-activity").value = activityName;
+      applyLanguage(false);
+      renderSidebarRows();
+      syncPreview();
+    }
+
+    // Toggle current localization language
+    function toggleLanguage() {
+      currentLang = currentLang === "en" ? "fil" : "en";
+      
+      // Update toggle button text
+      document.getElementById("lbl-lang-toggle").innerText = currentLang === "en" ? "Filipino" : "English";
+      
+      populateActivityDropdown();
+      
+      // Attempt to load the translated version of the same selected activity
+      loadActivityTemplate(selectedActivityKey);
+    }
+
+    // Apply translations to all UI tags and labels
+    function applyLanguage(resetHeaders = true) {
+      const t = translations[currentLang];
+      
+      document.getElementById("lbl-settings-title").innerText = t.settingsTitle;
+      document.getElementById("lbl-header-section").innerText = t.headerSec;
+      document.getElementById("lbl-criteria-section").innerText = t.criteriaSec;
+      document.getElementById("lbl-school").innerText = t.schoolLabel;
+      document.getElementById("lbl-subject").innerText = t.subjectLabel;
+      document.getElementById("lbl-task").innerText = t.taskLabel;
+      document.getElementById("lbl-grade").innerText = t.gradeLabel;
+      document.getElementById("lbl-add-row-btn").innerText = t.addRowBtn;
+      document.getElementById("lbl-print-info").innerHTML = t.printInfo;
+      document.getElementById("lbl-quick-template").innerText = t.quickTemplate;
+      document.getElementById("lbl-print-top-btn").innerText = t.printBtn;
+      document.getElementById("lbl-clear-btn").innerText = t.clearBtn;
+      document.getElementById("lbl-reset-btn").innerText = t.resetBtn;
+      document.getElementById("lbl-search-helper").innerText = t.searchHelper;
+      
+      // Header Preview labels
+      document.getElementById("lbl-prev-subject").innerText = t.prevSubject;
+      document.getElementById("lbl-prev-grade").innerText = t.prevGrade;
+      document.getElementById("lbl-prev-student").innerText = t.prevStudent;
+      document.getElementById("lbl-prev-date").innerText = t.prevDate;
+      document.getElementById("lbl-prev-total").innerText = t.prevTotal;
+      document.getElementById("lbl-prev-signature").innerText = t.prevSignature;
+      document.getElementById("lbl-prev-signature-desc").innerText = t.prevSignatureDesc;
+      document.getElementById("lbl-signature-slot").innerText = t.signatureSlot;
+      document.getElementById("lbl-signature-sub").innerText = t.signatureSub;
+      document.getElementById("lbl-verified-stamp").innerText = t.verifiedStamp;
+      
+      // Table Header cells
+      document.getElementById("th-criteria").innerText = t.thCriteria;
+      document.getElementById("th-excellent").innerText = t.thExcellent;
+      document.getElementById("th-good").innerText = t.thGood;
+      document.getElementById("th-fair").innerText = t.thFair;
+      document.getElementById("th-poor").innerText = t.thPoor;
+      document.getElementById("th-score").innerText = t.thScore;
+
+      if (resetHeaders) {
+        if (currentLang === "fil") {
+          document.getElementById("input-school").value = "Akademya ng ReelSystem";
+          document.getElementById("input-subject").value = "Malikhaing Pagsulat";
+          document.getElementById("input-grade").value = "Baitang 11 - Malikhaing Pangkat";
+        } else {
+          document.getElementById("input-school").value = "ReelSystem Academy";
+          document.getElementById("input-subject").value = "Creative Writing";
+          document.getElementById("input-grade").value = "Grade 11 - Prose";
+        }
+      }
+    }
+
+    // Fuzzy Offline search matching
+    function handleActivitySearchInput(val) {
+      syncPreview();
+      const query = val.toLowerCase().trim();
+      if (!query) return;
+
+      const keys = Object.keys(activityDb[currentLang]);
+      let bestMatch = null;
+      let highestScore = 0;
+
+      keys.forEach(key => {
+        const kLower = key.toLowerCase();
+        if (kLower === query) {
+          bestMatch = key;
+          highestScore = 999;
+        } else if (kLower.includes(query) && query.length > 3) {
+          const score = query.length / key.length;
+          if (score > highestScore) {
+            highestScore = score;
+            bestMatch = key;
+          }
+        }
+      });
+
+      if (bestMatch && highestScore > 0.3) {
+        selectedActivityKey = bestMatch;
+        activeRows = JSON.parse(JSON.stringify(activityDb[currentLang][bestMatch]));
+        document.getElementById("select-activity").value = bestMatch;
+        renderSidebarRows();
+        syncPreview();
+      }
+    }
+
+    // Add empty custom criteria row
+    function addCriteriaRow() {
+      const emptyRow = {
+        name: currentLang === "en" ? "New Performance Criterion" : "Bagong Pamantayan",
+        weight: 10,
+        excellent: "",
+        good: "",
+        fair: "",
+        poor: ""
+      };
+      activeRows.push(emptyRow);
+      renderSidebarRows();
+      syncPreview();
+      lucide.createIcons();
+    }
+
+    // Remove criteria row
+    function removeCriteriaRow(index) {
+      activeRows.splice(index, 1);
+      renderSidebarRows();
+      syncPreview();
+      lucide.createIcons();
+    }
+
+    // Update specific value inside index object
+    function updateRowVal(index, field, value) {
+      activeRows[index][field] = field === 'weight' ? (parseInt(value) || 0) : value;
+      syncPreview();
+    }
+
+    // Clear entire sheet
+    function clearAllRows() {
+      activeRows = [];
+      renderSidebarRows();
+      syncPreview();
+    }
+
+    // Reset to selected default template
+    function resetToDefaultActivity() {
+      loadActivityTemplate(selectedActivityKey);
+    }
+
+    // Render configuration fields inside parameters sidebar
+    function renderSidebarRows() {
+      const container = document.getElementById("criteria-inputs-container");
+      container.innerHTML = "";
+
+      activeRows.forEach((row, i) => {
+        const rowDiv = document.createElement("div");
+        rowDiv.className = "p-4 bg-pink-50/50 border-2 border-slate-900 rounded-2xl relative space-y-3 shadow-[2px_2px_0px_rgba(0,0,0,1)]";
+        rowDiv.innerHTML = `
+          <div class="flex justify-between items-center">
+            <span class="text-[10px] font-black font-mono text-pink-700 bg-pink-100 px-2 py-0.5 rounded-lg border border-pink-300">Dimension #${i + 1}</span>
+            <button onclick="removeCriteriaRow(${i})" class="text-rose-600 hover:text-rose-800 p-1 bg-white border border-slate-300 rounded-md transition-all shadow-[1px_1px_0px_rgba(0,0,0,1)]">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2">
+            <div class="col-span-2">
+              <label class="block text-[8px] font-bold uppercase tracking-wide text-slate-500 mb-0.5">Criteria Name</label>
+              <input type="text" value="${row.name}" class="w-full px-2 py-1 border-2 border-slate-900 rounded-lg text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-pink-300" oninput="updateRowVal(${i}, 'name', this.value)">
+            </div>
+            <div>
+              <label class="block text-[8px] font-bold uppercase tracking-wide text-slate-500 mb-0.5">Weight (%)</label>
+              <input type="number" value="${row.weight}" class="w-full px-2 py-1 border-2 border-slate-900 rounded-lg text-xs font-extrabold text-center focus:outline-none focus:ring-1 focus:ring-pink-300" oninput="updateRowVal(${i}, 'weight', this.value)">
+            </div>
+          </div>
+
+          <div class="space-y-1.5">
+            <div>
+              <label class="block text-[8px] font-bold text-slate-500 uppercase tracking-wide">Excellent (4 pts) Description</label>
+              <textarea class="w-full h-11 px-2 py-1 border border-slate-400 rounded-lg text-[10px] focus:outline-none focus:ring-1 focus:ring-pink-300" oninput="updateRowVal(${i}, 'excellent', this.value)">${row.excellent}</textarea>
+            </div>
+            <div>
+              <label class="block text-[8px] font-bold text-slate-500 uppercase tracking-wide">Good (3 pts) Description</label>
+              <textarea class="w-full h-11 px-2 py-1 border border-slate-400 rounded-lg text-[10px] focus:outline-none focus:ring-1 focus:ring-pink-300" oninput="updateRowVal(${i}, 'good', this.value)">${row.good}</textarea>
+            </div>
+            <div>
+              <label class="block text-[8px] font-bold text-slate-500 uppercase tracking-wide">Fair (2 pts) Description</label>
+              <textarea class="w-full h-11 px-2 py-1 border border-slate-400 rounded-lg text-[10px] focus:outline-none focus:ring-1 focus:ring-pink-300" oninput="updateRowVal(${i}, 'fair', this.value)">${row.fair}</textarea>
+            </div>
+            <div>
+              <label class="block text-[8px] font-bold text-slate-500 uppercase tracking-wide">Poor (1 pt) Description</label>
+              <textarea class="w-full h-11 px-2 py-1 border border-slate-400 rounded-lg text-[10px] focus:outline-none focus:ring-1 focus:ring-pink-300" oninput="updateRowVal(${i}, 'poor', this.value)">${row.poor}</textarea>
+            </div>
+          </div>
+        `;
+        container.appendChild(rowDiv);
+      });
+    }
+
+    // Sync state values to A4 layout page preview markup
+    function syncPreview() {
+      // Headers
+      document.getElementById("preview-school-top").innerText = document.getElementById("input-school").value || "REELSYSTEM EXEMPLAR HIGH";
+      document.getElementById("preview-task-top").innerText = document.getElementById("input-task").value || "PERFORMANCE TASK RUBRIC CRITERIA SHEET";
+      document.getElementById("preview-subject-top").innerText = document.getElementById("input-subject").value || "General Subject";
+      document.getElementById("preview-grade-top").innerText = document.getElementById("input-grade").value || "Grade 11 - Academics";
+
+      // Calculate Total weight
+      let totalWeight = 0;
+      activeRows.forEach(row => totalWeight += row.weight);
+      document.getElementById("preview-total-weight").innerText = totalWeight + "%";
+
+      // Render weight validation badge
+      const badge = document.getElementById("weight-badge-container");
+      if (totalWeight === 100) {
+        badge.className = "flex justify-center p-2 rounded-xl border-2 border-emerald-900 bg-emerald-50 text-emerald-800 text-xs font-black uppercase tracking-wide gap-1.5";
+        badge.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i><span>✓ Weight: 100% Validated</span>`;
+      } else {
+        badge.className = "flex justify-center p-2 rounded-xl border-2 border-rose-900 bg-rose-50 text-rose-800 text-xs font-black uppercase tracking-wide gap-1.5 animate-pulse";
+        badge.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4 text-rose-600"></i><span>⚠️ Total weight is ${totalWeight}%, must be 100%!</span>`;
+      }
+      lucide.createIcons();
+
+      // Populate preview table
+      const tbody = document.getElementById("preview-table-body");
+      tbody.innerHTML = "";
+
+      activeRows.forEach((row, idx) => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-50/50 text-xs";
+        tr.innerHTML = `
+          <td class="p-2.5 font-bold text-slate-900 border-r-2 border-slate-900 leading-tight">
+            <span class="block">${row.name}</span>
+            <span class="text-[9px] font-black text-pink-700 bg-pink-100/60 px-1.5 py-0.5 rounded border border-pink-200 inline-block mt-1 font-mono">${row.weight}%</span>
+          </td>
+          <td class="p-2 border-r border-slate-300 leading-normal text-[10px] text-slate-600">${row.excellent || '<span class="text-slate-300 italic">No description</span>'}</td>
+          <td class="p-2 border-r border-slate-300 leading-normal text-[10px] text-slate-600">${row.good || '<span class="text-slate-300 italic">No description</span>'}</td>
+          <td class="p-2 border-r border-slate-300 leading-normal text-[10px] text-slate-600">${row.fair || '<span class="text-slate-300 italic">No description</span>'}</td>
+          <td class="p-2 border-r border-slate-300 leading-normal text-[10px] text-slate-600">${row.poor || '<span class="text-slate-300 italic">No description</span>'}</td>
+          <td class="p-2 border-slate-300 text-center font-bold text-slate-300">/ 4</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Bulletproof Popup Printer (Works in sandboxed frames perfectly)
+    function printRubric() {
+      const element = document.getElementById("reelsystem-printable-rubric-canvas");
+      if (!element) {
+        window.print();
+        return;
+      }
+      const printWin = window.open("", "_blank");
+      if (!printWin) {
+        window.print();
+        return;
+      }
+      printWin.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>${document.getElementById("input-task").value || 'Rubric'}</title>
+            <script src="https://cdn.tailwindcss.com"></script>
+            <style>
+              @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap');
+              body {
+                font-family: 'Inter', sans-serif;
+                background-color: #ffffff;
+                color: #1E293B;
+                padding: 15px;
+              }
+              @media print {
+                @page {
+                  size: A4 portrait;
+                  margin: 10mm;
+                }
+                body {
+                  background-color: #ffffff !important;
+                }
+              }
+              table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+              th, td { border: 2px solid #000000 !important; padding: 6px 8px; font-size: 11px; }
+              th { background-color: #FCE7F3 !important; }
+            </style>
+          </head>
+          <body onload="window.print(); window.close();">
+            <div>
+              ${element.innerHTML}
+            </div>
+          </body>
+        </html>
+      `);
+      printWin.document.close();
+    }
+
+    // Fire application booting sequence
+    window.onload = init;
+  </script>
+</body>
+</html>

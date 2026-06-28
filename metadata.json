@@ -1,0 +1,6 @@
+{
+  "name": "REEL IN ONE",
+  "description": "REEL IN ONE by REELSYSTEM: An advanced AI-powered educational suite featuring the standard ILAW Lesson Plan Generator, full format converters (MATATAG DLL, Lesson Exemplars, and Traditional DLPs to/from ILAW), and an intelligent AI Assistant with Google Search Grounding to find online resources.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

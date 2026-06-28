@@ -1,0 +1,119 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 1. Global safety net catch-all: Deny all reads and writes by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Primitive / Global Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Entity-Specific Structural Validation Blueprint
+    function isValidRubric(data) {
+      return data.id is string && data.id.size() <= 128
+        && data.title is string && data.title.size() <= 200
+        && data.gradeLevel is string && data.gradeLevel.size() <= 100
+        && data.subject is string && data.subject.size() <= 100
+        && data.assessmentType is string && data.assessmentType.size() <= 100
+        && data.userId == request.auth.uid
+        && data.criteria is list && data.criteria.size() <= 20;
+    }
+
+    function isValidSession(data) {
+      return data.id is string && data.id.size() <= 128
+        && data.rubricId is string && data.rubricId.size() <= 128
+        && data.title is string && data.title.size() <= 200
+        && data.depEdMode is bool
+        && data.userId == request.auth.uid
+        && data.students is list && data.students.size() <= 100;
+    }
+
+    function isValidFeedback(data) {
+      return data.id is string && data.id.size() <= 128
+        && data.name is string && data.name.size() <= 100
+        && data.comment is string && data.comment.size() <= 1000
+        && data.rating is number && data.rating >= 1 && data.rating <= 5
+        && data.createdAt is string;
+    }
+
+    // ------------------------------------------------------------------------
+    // RUBRICS COLLECTION RULES
+    // ------------------------------------------------------------------------
+    match /rubrics/{rubricId} {
+      // 1. READ rules (get and list)
+      // Must enforce relational owner check so that no user can query other educators' rubrics
+      allow get: if isSignedIn() && isValidId(rubricId) && existing().userId == request.auth.uid;
+      allow list: if isSignedIn() && existing().userId == request.auth.uid;
+
+      // 2. CREATE rules
+      // Pre-admission size constraint, ownership structure, and timestamp check
+      allow create: if isSignedIn() 
+        && isValidId(rubricId)
+        && isValidRubric(incoming())
+        && incoming().createdAt is string; // Preseed checks are strings or dates, allowing standard clients
+
+      // 3. UPDATE rules
+      // Owner lock, schema safety, immutable createdAt, and updating updatedAt/modified stats
+      allow update: if isSignedIn()
+        && isValidId(rubricId)
+        && existing().userId == request.auth.uid
+        && isValidRubric(incoming())
+        && incoming().userId == existing().userId
+        && incoming().createdAt == existing().createdAt;
+
+      // 4. DELETE rules
+      allow delete: if isSignedIn() && isValidId(rubricId) && existing().userId == request.auth.uid;
+    }
+
+    // ------------------------------------------------------------------------
+    // GRADING SESSIONS COLLECTION RULES
+    // ------------------------------------------------------------------------
+    match /sessions/{sessionId} {
+      // 1. READ rules (get and list)
+      allow get: if isSignedIn() && isValidId(sessionId) && existing().userId == request.auth.uid;
+      allow list: if isSignedIn() && existing().userId == request.auth.uid;
+
+      // 2. CREATE rules
+      allow create: if isSignedIn()
+        && isValidId(sessionId)
+        && isValidSession(incoming())
+        && incoming().createdAt is string;
+
+      // 3. UPDATE rules
+      allow update: if isSignedIn()
+        && isValidId(sessionId)
+        && existing().userId == request.auth.uid
+        && isValidSession(incoming())
+        && incoming().userId == existing().userId
+        && incoming().createdAt == existing().createdAt;
+
+      // 4. DELETE rules
+      allow delete: if isSignedIn() && isValidId(sessionId) && existing().userId == request.auth.uid;
+    }
+
+    // ------------------------------------------------------------------------
+    // FEEDBACK COLLECTION RULES
+    // ------------------------------------------------------------------------
+    match /feedback/{feedbackId} {
+      allow get, list: if true;
+      allow create: if isValidId(feedbackId) && isValidFeedback(incoming());
+      allow update, delete: if false;
+    }
+  }
+}

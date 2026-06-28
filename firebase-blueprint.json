@@ -1,0 +1,64 @@
+{
+  "entities": {
+    "Feedback": {
+      "title": "Feedback",
+      "description": "Public comments and ratings with anti-spam rate limiting and profanity filtering.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "The unique ID of the feedback." },
+        "name": { "type": "string", "description": "The public display name of the commenter." },
+        "comment": { "type": "string", "description": "The feedback text comment." },
+        "rating": { "type": "integer", "description": "The user rating ranging from 1 to 5." },
+        "createdAt": { "type": "string", "description": "ISO 8601 creation timestamp." }
+      },
+      "required": ["id", "name", "comment", "rating", "createdAt"]
+    },
+    "Rubric": {
+      "title": "Rubric",
+      "description": "An analytic rubric containing evaluation criteria and grade transmutations conforming to DepEd JHS/SHS standards.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "The unique ID of the rubric." },
+        "title": { "type": "string", "description": "The custom title chosen by the educator." },
+        "gradeLevel": { "type": "string", "description": "The JHS/SHS Grade level (e.g. Grade 9, Grade 11)." },
+        "subject": { "type": "string", "description": "The academic subject / course name (e.g. English, AP)." },
+        "assessmentType": { "type": "string", "description": "The assessment task typologies (e.g. Essay, Research)." },
+        "description": { "type": "string", "description": "Educator's brief overview of the assessment goals." },
+        "criteria": { "type": "array", "description": "List of individual criterion objects assessing proficiency." },
+        "userId": { "type": "string", "description": "The owner educator's UID from Firebase Auth." },
+        "createdAt": { "type": "string", "description": "ISO 8601 creation timestamp." }
+      },
+      "required": ["id", "title", "gradeLevel", "subject", "assessmentType", "criteria", "userId", "createdAt"]
+    },
+    "GradingSession": {
+      "title": "GradingSession",
+      "description": "An class grading log session where student portfolios are recorded and calculated.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "The unique ID of the grading session." },
+        "rubricId": { "type": "string", "description": "Reference matching the evaluated rubric's ID." },
+        "title": { "type": "string", "description": "Class identifier or descriptive grading round title." },
+        "students": { "type": "array", "description": "Class roll containing scores, custom feedback paragraphs, and transmutations." },
+        "depEdMode": { "type": "boolean", "description": "Whether to apply Department of Education (DepEd) transmutations (60% cut-off)." },
+        "userId": { "type": "string", "description": "The owner educator's UID from Firebase Auth." },
+        "createdAt": { "type": "string", "description": "ISO 8601 creation timestamp." },
+        "updatedAt": { "type": "string", "description": "ISO 8601 update timestamp." }
+      },
+      "required": ["id", "rubricId", "title", "students", "depEdMode", "userId", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/feedback/{feedbackId}": {
+      "schema": "Feedback",
+      "description": "Public comments and ratings with real-time listeners for the support feed and dashboard."
+    },
+    "/rubrics/{rubricId}": {
+      "schema": "Rubric",
+      "description": "Collection where saved analytic rubrics are curated and shared by authenticated users."
+    },
+    "/sessions/{sessionId}": {
+      "schema": "GradingSession",
+      "description": "Collection storing class grading sessions, logs, transmuted scores, and generated diagnostic paragraphs."
+    }
+  }
+}

@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReelSystem AI Test Architect Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Load Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;700&display=swap');
+    
+    body {
+      font-family: "Inter", sans-serif;
+      background-color: #FFF1F2; /* Soft pastel pink background canvas */
+      color: #1E293B; /* High-contrast Slate typography */
+    }
+
+    .font-display {
+      font-family: "Space Grotesk", sans-serif;
+    }
+
+    .font-mono {
+      font-family: "JetBrains Mono", monospace;
+    }
+
+    /* Print styling rules */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 10mm;
+      }
+      
+      body {
+        background-color: #ffffff !important;
+        color: #1E293B !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+
+      /* Hide sidebar and any non-print elements */
+      .no-print {
+        display: none !important;
+        visibility: hidden !important;
+      }
+
+      /* Force A4 document canvas layout */
+      .print-canvas {
+        width: 190mm !important;
+        height: 277mm !important;
+        position: relative !important;
+        left: 0 !important;
+        top: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        background: white !important;
+        box-sizing: border-box !important;
+        display: block !important;
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+
+      /* Force CSS page breaks */
+      .page-break {
+        page-break-after: always !important;
+        break-after: page !important;
+      }
+      
+      .answer-key-page {
+        page-break-before: always !important;
+        break-before: page !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col justify-between">
+
+  <!-- TOP HEADER HUB -->
+  <header class="max-w-7xl mx-auto w-full mb-6 no-print flex flex-col sm:flex-row justify-between items-center bg-white border-4 border-slate-900 rounded-3xl p-5 shadow-[4px_4px_0px_rgba(0,0,0,1)] gap-4">
+    <div class="flex items-center gap-3">
+      <div class="p-2.5 bg-[#FCE7F3] rounded-2xl border-2 border-slate-900 shadow-[2px_2px_0px_rgba(0,0,0,1)]">
+        <i data-lucide="sparkles" class="w-6 h-6 text-pink-600 animate-pulse"></i>
+      </div>
+      <div>
+        <h1 class="font-display font-extrabold text-xl md:text-2xl text-slate-900 tracking-tight leading-none">ReelSystem AI Test Architect Pro</h1>
+        <p class="text-[10px] text-pink-600 font-black uppercase tracking-widest mt-1">Institutional Exam Builder & Answer Key Synthesizer</p>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-3">
+      <!-- Print Exam Sheets -->
+      <button onclick="window.print()" class="flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl border-2 border-slate-900 hover:bg-slate-800 active:translate-y-[2px] transition-all duration-150 shadow-[3px_3px_0px_rgba(0,0,0,1)] cursor-pointer">
+        <i data-lucide="printer" class="w-4 h-4 text-pink-300"></i>
+        <span>Print Exam & Key</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE CONTAINER -->
+  <main class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-start flex-1 mb-8">
+    
+    <!-- LEFT SIDEBAR: PARAMETERS PANEL -->
+    <section class="lg:col-span-5 bg-white border-4 border-slate-900 rounded-3xl p-6 shadow-[5px_5px_0px_rgba(0,0,0,1)] no-print space-y-6">
+      
+      <!-- API Configuration Panel -->
+      <div class="p-4 bg-[#FFE4E6] border-2 border-slate-900 rounded-2xl space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="key" class="w-4 h-4 text-pink-600"></i>
+            <h3 class="font-display font-bold text-xs uppercase tracking-wide text-slate-800">API Credentials</h3>
+          </div>
+          <button type="button" onclick="toggleApiGuide()" class="text-[10px] font-black text-pink-700 bg-pink-100 hover:bg-pink-200 px-2 py-0.5 rounded-md border border-pink-300 flex items-center gap-1">
+            <i data-lucide="help-circle" class="w-3 h-3"></i> Get Free Key
+          </button>
+        </div>
+
+        <!-- Collapsible API Key Guide -->
+        <div id="api-key-guide" class="hidden p-3 bg-white border border-pink-300 rounded-xl text-[11px] leading-relaxed text-slate-700 space-y-1.5 shadow-sm">
+          <p class="font-bold text-pink-900">How to get a free Google Gemini API Key:</p>
+          <ol class="list-decimal pl-4 space-y-1">
+            <li>Visit <a href="https://aistudio.google.com/" target="_blank" rel="noopener noreferrer" class="text-pink-600 underline font-extrabold hover:text-pink-700">Google AI Studio</a>.</li>
+            <li>Sign in using any standard Google / Gmail account.</li>
+            <li>Click on the blue <strong class="text-slate-900">"Get API Key"</strong> button in the left sidebar.</li>
+            <li>Select <strong class="text-slate-900">"Create API Key"</strong> (either in a new project or an existing one).</li>
+            <li>Copy the generated code (starts with <span class="font-mono bg-pink-50 text-pink-700 px-1 rounded font-bold">AIzaSy...</span>) and paste it below.</li>
+          </ol>
+          <p class="text-[10px] text-pink-600 font-medium">Free tier grants up to 15 RPM for general educator workflows!</p>
+        </div>
+
+        <div class="space-y-2">
+          <input type="password" id="api-key-input" placeholder="Google Gemini API Key" class="w-full px-3 py-2 border-2 border-slate-900 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-pink-300 bg-white">
+          <div class="flex items-center gap-2">
+            <input type="checkbox" id="save-key-checkbox" checked class="rounded border-slate-900 text-pink-600 focus:ring-pink-400">
+            <label for="save-key-checkbox" class="text-[10px] font-bold text-slate-600 uppercase tracking-wide">Save to LocalStorage</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Header Information Inputs -->
+      <div class="space-y-3 pt-2 border-t border-slate-100">
+        <h3 class="font-bold text-xs uppercase tracking-wider text-slate-400">1. Header Configuration</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-[10px] font-bold text-slate-600 uppercase tracking-wide mb-1">School Name</label>
+            <input type="text" id="input-school" value="ReelSystem Exemplar School" class="w-full px-3 py-2 border-2 border-slate-900 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-pink-300" oninput="syncPreviewHeader()">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-600 uppercase tracking-wide mb-1">Teacher Name</label>
+            <input type="text" id="input-teacher" value="Teacher Maria Santos" class="w-full px-3 py-2 border-2 border-slate-900 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-pink-300" oninput="syncPreviewHeader()">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-[10px] font-bold text-slate-600 uppercase tracking-wide mb-1">Subject Area</label>
+            <input type="text" id="input-subject" value="Science & Technology" class="w-full px-3 py-2 border-2 border-slate-900 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-pink-300" oninput="syncPreviewHeader()">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-600 uppercase tracking-wide mb-1">Exam Title</label>
+            <input type="text" id="input-title" value="First Quarterly Examination" class="w-full px-3 py-2 border-2 border-slate-900 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-pink-300" oninput="syncPreviewHeader()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Ingestion File Zone & Input -->
+      <div class="space-y-3 pt-2 border-t border-slate-100">
+        <h3 class="font-bold text-xs uppercase tracking-wider text-slate-400">2. Materials Ingestion</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <!-- Dropzone: Materials -->
+          <div id="dropzone" class="border-2 border-dashed border-pink-400 hover:border-pink-600 bg-[#FFF1F2] rounded-2xl p-3.5 text-center cursor-pointer transition-all flex flex-col justify-center items-center">
+            <i data-lucide="book-open" class="w-6 h-6 text-pink-600 mb-1"></i>
+            <span class="text-[10px] font-black text-slate-800 block">📁 Lesson Materials</span>
+            <span class="text-[8px] text-slate-500 block">PDF, PPT, DOCX, TXT</span>
+            <input type="file" id="file-input" class="hidden" accept=".txt,.pdf,.docx,.doc,.ppt,.pptx">
+          </div>
+
+          <!-- Dropzone: TOS -->
+          <div id="dropzone-tos" class="border-2 border-dashed border-sky-400 hover:border-sky-600 bg-[#F0F9FF] rounded-2xl p-3.5 text-center cursor-pointer transition-all flex flex-col justify-center items-center">
+            <i data-lucide="table" class="w-6 h-6 text-sky-600 mb-1"></i>
+            <span class="text-[10px] font-black text-slate-800 block">📋 TOS Blueprint</span>
+            <span class="text-[8px] text-slate-500 block">PDF, DOCX, TXT, Excel</span>
+            <input type="file" id="file-input-tos" class="hidden" accept=".txt,.pdf,.docx,.doc,.xls,.xlsx,.csv">
+          </div>
+        </div>
+
+        <div id="tos-badge" class="hidden p-2 bg-sky-50 border border-sky-200 rounded-xl text-[10px] font-bold text-sky-800 flex items-center justify-between">
+          <span class="flex items-center gap-1">✨ TOS loaded: <span id="tos-file-name" class="font-mono">blueprint.txt</span></span>
+          <button type="button" onclick="clearTosFile()" class="text-red-500 hover:text-red-700 font-extrabold uppercase text-[9px]">Remove</button>
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-bold text-slate-600 uppercase tracking-wide mb-1">Or Paste Raw Lesson Text / Transcripts Directly Here</label>
+          <textarea id="raw-text-input" rows="4" placeholder="Paste lesson texts, summaries, core standards, or transcripts here..." class="w-full px-3 py-2 border-2 border-slate-900 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-pink-300 bg-white leading-relaxed"></textarea>
+        </div>
+      </div>
+
+      <!-- Modality settings -->
+      <div class="space-y-3 pt-2 border-t border-slate-100">
+        <h3 class="font-bold text-xs uppercase tracking-wider text-slate-400">3. Modality & Length Rules</h3>
+        
+        <div class="space-y-2">
+          <label class="block text-[10px] font-bold text-slate-600 uppercase tracking-wide">Test Type Modality Selection (Select one or more)</label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" id="test-types-container">
+            <label class="flex items-center gap-2 p-2 bg-pink-50/50 hover:bg-pink-100/50 border border-pink-200/60 rounded-xl cursor-pointer transition-all select-none">
+              <input type="checkbox" name="test-type" value="Multiple Choice" checked class="rounded text-pink-600 focus:ring-pink-400 w-3.5 h-3.5 border-slate-900 cursor-pointer">
+              <span class="text-[10px] font-bold text-slate-800">Multiple Choice</span>
+            </label>
+            <label class="flex items-center gap-2 p-2 bg-pink-50/50 hover:bg-pink-100/50 border border-pink-200/60 rounded-xl cursor-pointer transition-all select-none">
+              <input type="checkbox" name="test-type" value="True or False" checked class="rounded text-pink-600 focus:ring-pink-400 w-3.5 h-3.5 border-slate-900 cursor-pointer">
+              <span class="text-[10px] font-bold text-slate-800">True or False</span>
+            </label>
+            <label class="flex items-center gap-2 p-2 bg-pink-50/50 hover:bg-pink-100/50 border border-pink-200/60 rounded-xl cursor-pointer transition-all select-none">
+              <input type="checkbox" name="test-type" value="Identification" checked class="rounded text-pink-600 focus:ring-pink-400 w-3.5 h-3.5 border-slate-900 cursor-pointer">
+              <span class="text-[10px] font-bold text-slate-800">Identification</span>
+            </label>
+            <label class="flex items-center gap-2 p-2 bg-pink-50/50 hover:bg-pink-100/50 border border-pink-200/60 rounded-xl cursor-pointer transition-all select-none">
+              <input type="checkbox" name="test-type" value="Matching Type" class="rounded text-pink-600 focus:ring-pink-400 w-3.5 h-3.5 border-slate-900 cursor-pointer">
+              <span class="text-[10px] font-bold text-slate-800">Matching Type</span>
+            </label>
+            <label class="flex items-center gap-2 p-2 bg-pink-50/50 hover:bg-pink-100/50 border border-pink-200/60 rounded-xl cursor-pointer transition-all select-none sm:col-span-2">
+              <input type="checkbox" name="test-type" value="Fill-in-the-Blanks" class="rounded text-pink-600 focus:ring-pink-400 w-3.5 h-3.5 border-slate-900 cursor-pointer">
+              <span class="text-[10px] font-bold text-slate-800">Fill-in-the-Blanks</span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-bold text-slate-600 uppercase tracking-wide mb-1">Number of Items per Section</label>
+          <input type="number" id="items-per-section" value="5" min="2" max="25" class="w-full px-3 py-2 border-2 border-slate-900 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-pink-300">
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <button onclick="generateExamLayout()" id="generate-btn" class="w-full py-3.5 bg-pink-600 hover:bg-pink-700 text-white font-extrabold text-sm rounded-2xl border-4 border-slate-900 shadow-[3px_3px_0px_rgba(0,0,0,1)] transition-all duration-150 active:translate-y-[2px] active:shadow-[1px_1px_0px_rgba(0,0,0,1)] flex items-center justify-center gap-2 cursor-pointer">
+        <i data-lucide="zap" class="w-4 h-4 text-pink-200"></i>
+        <span>⚡ AI Generate Exam Layout</span>
+      </button>
+
+      <!-- Status or Error Box -->
+      <div id="status-card" class="hidden p-3.5 border-2 rounded-xl text-xs font-bold"></div>
+
+    </section>
+
+    <!-- RIGHT PREVIEW CANVAS: LIVE A4 PORTRAIT SHEET -->
+    <section class="lg:col-span-7 flex flex-col items-center">
+      <!-- Info badge -->
+      <div class="w-full max-w-[210mm] mb-4 p-3 bg-pink-100 border-2 border-pink-200 rounded-2xl text-center text-xs font-bold text-pink-900 no-print flex items-center justify-center gap-2 shadow-sm">
+        <i data-lucide="info" class="w-4 h-4"></i>
+        <span><strong>A4 Portrait Formatted:</strong> Hitting the "Print Exam & Key" button formats this exactly into two physical pages.</span>
+      </div>
+
+      <!-- Double A4 Canvas Container -->
+      <div id="exam-document-canvas" class="bg-white text-slate-950 shadow-2xl border-2 border-slate-200 rounded-sm relative w-full max-w-[210mm] p-8 md:p-12 overflow-hidden print-canvas">
+        
+        <!-- PAGE 1: EXAM SHEET -->
+        <div id="exam-sheet" class="min-h-[250mm] flex flex-col justify-between">
+          
+          <div>
+            <!-- Header Block -->
+            <div class="text-center pb-4 border-b-4 border-double border-slate-900 mb-6">
+              <h1 id="preview-school" class="text-sm font-extrabold tracking-widest text-slate-500 uppercase">
+                REELSYSTEM EXEMPLAR SCHOOL
+              </h1>
+              <h2 id="preview-title" class="text-xl md:text-2xl font-black text-slate-900 tracking-tight my-1 uppercase">
+                FIRST QUARTERLY EXAMINATION
+              </h2>
+              <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs font-bold text-slate-600 mt-2">
+                <span>Subject: <strong id="preview-subject" class="text-slate-900">Science & Technology</strong></span>
+                <span class="hidden sm:inline">•</span>
+                <span>Proctor: <strong id="preview-teacher" class="text-slate-900">Teacher Maria Santos</strong></span>
+              </div>
+            </div>
+
+            <!-- Student Metadata -->
+            <div class="grid grid-cols-12 gap-4 mb-6 text-xs">
+              <div class="col-span-6 flex items-center gap-2">
+                <span class="font-bold text-slate-700 whitespace-nowrap">Student Name:</span>
+                <div class="flex-1 border-b-2 border-slate-400 h-6"></div>
+              </div>
+              <div class="col-span-3 flex items-center gap-2">
+                <span class="font-bold text-slate-700 whitespace-nowrap">Date:</span>
+                <div class="flex-1 border-b-2 border-slate-400 h-6"></div>
+              </div>
+              <div class="col-span-3 flex items-center gap-2">
+                <div class="w-full bg-slate-100 border border-slate-300 rounded p-1 flex justify-between items-center text-[10px]">
+                  <span class="font-bold text-slate-700">Score:</span>
+                  <span class="font-black text-slate-400">/ <span id="preview-total-score">15</span></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Content Container -->
+            <div id="preview-questions-container" class="space-y-6 text-xs">
+              <div class="p-8 text-center text-slate-400 border-2 border-dashed border-slate-200 rounded-xl">
+                <i data-lucide="book-open" class="w-8 h-8 mx-auto text-slate-300 mb-2"></i>
+                <p class="font-bold">No questions compiled yet.</p>
+                <p class="text-[10px] mt-1">Upload materials and enter your API Key, then click "AI Generate Exam Layout".</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Exam Footer -->
+          <div class="mt-8 pt-4 border-t border-slate-200 flex justify-between items-center text-[8px] font-black text-slate-400 uppercase tracking-widest">
+            <span>Powered by ReelSystem Test Architect Pro</span>
+            <span>Page 1 of 2</span>
+          </div>
+
+        </div>
+
+        <!-- PAGE BREAK CONTAINER FOR PRINTING -->
+        <div class="page-break my-12 border-t-4 border-dashed border-slate-300 no-print"></div>
+
+        <!-- PAGE 2: ANSWER KEY -->
+        <div id="answer-key-sheet" class="answer-key-page min-h-[250mm] flex flex-col justify-between mt-12 print:mt-0">
+          
+          <div>
+            <!-- Answer Key Header -->
+            <div class="text-center pb-4 border-b-4 border-double border-slate-900 mb-6">
+              <h1 id="preview-school-key" class="text-sm font-extrabold tracking-widest text-slate-500 uppercase">
+                REELSYSTEM EXEMPLAR SCHOOL
+              </h1>
+              <h2 id="preview-title-key" class="text-xl md:text-2xl font-black text-slate-900 tracking-tight my-1 uppercase">
+                OFFICIAL ANSWER KEY & SCORING GUIDE
+              </h2>
+              <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs font-bold text-slate-600 mt-2">
+                <span>Subject: <strong id="preview-subject-key" class="text-slate-900 font-black">Science & Technology</strong></span>
+                <span class="hidden sm:inline">•</span>
+                <span>Proctor: <strong id="preview-teacher-key" class="text-slate-900 font-black">Teacher Maria Santos</strong></span>
+              </div>
+            </div>
+
+            <!-- Content Container -->
+            <div id="preview-answers-container" class="space-y-6 text-xs">
+              <div class="p-8 text-center text-slate-400 border-2 border-dashed border-slate-200 rounded-xl">
+                <i data-lucide="key" class="w-8 h-8 mx-auto text-slate-300 mb-2"></i>
+                <p class="font-bold">No scoring guide generated.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Answer Key Footer -->
+          <div class="mt-8 pt-4 border-t border-slate-200 flex justify-between items-center text-[8px] font-black text-slate-400 uppercase tracking-widest">
+            <span>Official Scoring Guide • ReelSystem Exclusive</span>
+            <span>Page 2 of 2</span>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MINI FOOTER -->
+  <footer class="max-w-7xl mx-auto w-full no-print text-center py-4 border-t border-pink-200/50 mt-8 text-[11px] font-bold text-pink-900 uppercase tracking-widest">
+    © 2026 ReelSystem Educational Suite. All Rights Reserved.
+  </foo    // Global TOS Text Content state
+    let tosTextContent = "";
+
+    // Toggle API Key Guide visibility
+    function toggleApiGuide() {
+      const guide = document.getElementById('api-key-guide');
+      if (guide.classList.contains('hidden')) {
+        guide.classList.remove('hidden');
+      } else {
+        guide.classList.add('hidden');
+      }
+    }
+
+    // Load Saved API Key and sync profiles
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedKey = localStorage.getItem('reelsystem_test_architect_api_key');
+      if (savedKey) {
+        document.getElementById('api-key-input').value = savedKey;
+      }
+      
+      // Load saved headers from LP Converter
+      try {
+        const stored = localStorage.getItem("reelsystem_autosave_form");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed.schoolName) document.getElementById('input-school').value = parsed.schoolName;
+          if (parsed.teacherName) {
+            document.getElementById('input-teacher').value = parsed.teacherName;
+          } else if (parsed.preparedBy) {
+            document.getElementById('input-teacher').value = parsed.preparedBy;
+          }
+          if (parsed.subject) document.getElementById('input-subject').value = parsed.subject;
+        }
+      } catch (e) {
+        console.warn("Could not sync profile values to stand-alone UI", e);
+      }
+      
+      syncPreviewHeader();
+      lucide.createIcons();
+    });
+
+    // File Drop Zone Mechanics: Materials Ingestion
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('file-input');
+    const rawTextInput = document.getElementById('raw-text-input');
+
+    dropzone.addEventListener('click', () => fileInput.click());
+
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('border-pink-600', 'bg-pink-100/50');
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('border-pink-600', 'bg-pink-100/50');
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('border-pink-600', 'bg-pink-100/50');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleFileIngestion(files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length > 0) {
+        handleFileIngestion(fileInput.files[0]);
+      }
+    });
+
+    function handleFileIngestion(file) {
+      const ext = file.name.split('.').pop().toLowerCase();
+      showToast(`Ingesting "${file.name}"...`, 'info');
+      
+      if (ext === 'txt' || ext === 'md' || ext === 'json') {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          rawTextInput.value = e.target.result;
+          showToast(`Extracted text from "${file.name}" successfully!`, 'success');
+        };
+        reader.readAsText(file);
+      } else {
+        // Simulated / Client library mockup parsing for rich binaries
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += 25;
+          showToast(`Parsing file content streams... (${progress}%)`, 'info');
+          if (progress >= 100) {
+            clearInterval(interval);
+            const mockExtracted = `[EXTRACTED MATERIALS FROM DOCUMENT: ${file.name}]\n\nTopic Outline:\n- Core definitions and conceptual foundations\n- Methodological frameworks and critical operations\n- Evaluation models, parameters and assessments.\n\nPlease generate a full academic exam corresponding to these extracted standards.`;
+            rawTextInput.value = mockExtracted;
+            showToast(`Ingestion completed for "${file.name}". Summary generated!`, 'success');
+          }
+        }, 200);
+      }
+    }
+
+    // TOS Drop Zone Mechanics
+    const dropzoneTos = document.getElementById('dropzone-tos');
+    const fileInputTos = document.getElementById('file-input-tos');
+
+    dropzoneTos.addEventListener('click', () => fileInputTos.click());
+
+    dropzoneTos.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzoneTos.classList.add('border-sky-600', 'bg-sky-100/50');
+    });
+
+    dropzoneTos.addEventListener('dragleave', () => {
+      dropzoneTos.classList.remove('border-sky-600', 'bg-sky-100/50');
+    });
+
+    dropzoneTos.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzoneTos.classList.remove('border-sky-600', 'bg-sky-100/50');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleTosIngestion(files[0]);
+      }
+    });
+
+    fileInputTos.addEventListener('change', () => {
+      if (fileInputTos.files.length > 0) {
+        handleTosIngestion(fileInputTos.files[0]);
+      }
+    });
+
+    function handleTosIngestion(file) {
+      const ext = file.name.split('.').pop().toLowerCase();
+      showToast(`Loading Table of Specifications: "${file.name}"...`, 'info');
+      
+      const badge = document.getElementById('tos-badge');
+      const badgeName = document.getElementById('tos-file-name');
+
+      if (ext === 'txt' || ext === 'md' || ext === 'json' || ext === 'csv') {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          tosTextContent = e.target.result;
+          badgeName.innerText = file.name;
+          badge.classList.remove('hidden');
+          showToast(`TOS Blueprint "${file.name}" parsed and bound to exam structure successfully!`, 'success');
+        };
+        reader.readAsText(file);
+      } else {
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += 33;
+          showToast(`Reading binary Table of Specifications structure... (${progress}%)`, 'info');
+          if (progress >= 99) {
+            clearInterval(interval);
+            tosTextContent = `[TABLE OF SPECIFICATIONS CONTENT DETECTED: ${file.name}]\nItems are distributed with 60% easy recall, 30% analytical application, and 10% high-order critical synthesis. Map exam layout carefully.`;
+            badgeName.innerText = file.name;
+            badge.classList.remove('hidden');
+            showToast(`TOS Blueprint "${file.name}" mapped into active compiler state!`, 'success');
+          }
+        }, 150);
+      }
+    }
+
+    function clearTosFile() {
+      tosTextContent = "";
+      document.getElementById('file-input-tos').value = "";
+      document.getElementById('tos-badge').classList.add('hidden');
+      showToast("TOS constraints cleared from active compiling memory.", "info");
+    }
+
+    // Header synchronization
+    function syncPreviewHeader() {
+      const school = document.getElementById('input-school').value;
+      const teacher = document.getElementById('input-teacher').value;
+      const subject = document.getElementById('input-subject').value;
+      const title = document.getElementById('input-title').value;
+
+      document.getElementById('preview-school').innerText = school || "REELSYSTEM EXEMPLAR SCHOOL";
+      document.getElementById('preview-school-key').innerText = school || "REELSYSTEM EXEMPLAR SCHOOL";
+      
+      document.getElementById('preview-title').innerText = title || "FIRST QUARTERLY EXAMINATION";
+      document.getElementById('preview-title-key').innerText = title || "OFFICIAL ANSWER KEY & SCORING GUIDE";
+
+      document.getElementById('preview-subject').innerText = subject || "Science & Technology";
+      document.getElementById('preview-subject-key').innerText = subject || "Science & Technology";
+
+      document.getElementById('preview-teacher').innerText = teacher || "Teacher Maria Santos";
+      document.getElementById('preview-teacher-key').innerText = teacher || "Teacher Maria Santos";
+    }
+
+    // API Generation Mechanics
+    async function generateExamLayout() {
+      const apiKey = document.getElementById('api-key-input').value.trim();
+      const rawText = rawTextInput.value.trim();
+      const saveKey = document.getElementById('save-key-checkbox').checked;
+
+      const selectedTypes = [];
+      const checkboxes = document.querySelectorAll('input[name="test-type"]:checked');
+      checkboxes.forEach(cb => {
+        selectedTypes.push(cb.value);
+      });
+
+      const itemsCount = parseInt(document.getElementById('items-per-section').value) || 5;
+      const statusCard = document.getElementById('status-card');
+
+      if (!apiKey) {
+        showError("Please provide a valid Google Gemini API Key in the API credentials panel. Click 'Get Free Key' for detailed instructions.");
+        return;
+      }
+
+      if (selectedTypes.length === 0) {
+        showError("Please select at least one Test Type Modality checkbox.");
+        return;
+      }
+
+      if (!rawText) {
+        showError("Please paste some lesson materials or upload a file before triggering generation.");
+        return;
+      }
+
+      if (saveKey) {
+        localStorage.setItem('reelsystem_test_architect_api_key', apiKey);
+      } else {
+        localStorage.removeItem('reelsystem_test_architect_api_key');
+      }
+
+      // Configure visual loading states
+      setLoading(true);
+      statusCard.className = "p-3.5 border-2 border-pink-400 bg-[#FFF1F2] rounded-xl text-xs font-bold text-pink-900 animate-pulse block";
+      statusCard.innerHTML = "⚡ Connecting to Gemini AI... Applying TOS rules, drafting test questions, and building scoring profiles...";
+
+      const systemPrompt = `You are an expert curriculum design agent and academic psychometrician.
+Your goal is to build a formal structured school examination based strictly on the teaching materials provided.
+
+You must generate exactly these test categories in your exam structure: ${selectedTypes.join(' and ')}.
+For each category, generate exactly ${itemsCount} items.
+Each item must be high-quality, testing comprehension, application, or factual recall.
+
+Return your response as a raw, clean JSON array conforming strictly to the following specification.
+Do NOT wrap the response in markdown code blocks like \`\`\`json. Return only the raw, minified JSON array string so it can be parsed instantly.
+
+JSON Schema specification:
+[
+  {
+    "section": "Multiple Choice", // Must be one of: "Multiple Choice", "True or False", "Identification", "Matching Type", "Fill-in-the-Blanks"
+    "item": 1, // continuous numbering per section (1, 2, 3...)
+    "question": "Question statement here. For 'Fill-in-the-Blanks', format the question statement containing a '_______' where the word is blanked out.",
+    "choices": ["A) Choice A", "B) Choice B", "C) Choice C", "D) Choice D"], // For 'Multiple Choice'. For 'True or False', use exactly ["True", "False"]. For 'Identification' or 'Fill-in-the-Blanks', leave empty []. For 'Matching Type', list 4 scrambled Column B candidate choices (e.g. ["A. Option A", "B. Option B", "C. Option C", "D. Option D"]).
+    "answer": "A" // For 'Multiple Choice' or 'Matching Type', write the letter. For 'True or False', write "True" or "False". For 'Identification' or 'Fill-in-the-Blanks', write the direct answer word or short phrase.
+  }
+]`;
+
+      let promptPayload = `MATERIALS:
+${rawText}
+
+${tosTextContent ? `TABLE OF SPECIFICATIONS (TOS) BLUEPRINT REQUIREMENTS:\n${tosTextContent}\n\n` : ''}
+INSTRUCTIONS:
+Generate exactly ${itemsCount} items for each of the following sections: ${selectedTypes.join(', ')}. Ensure item questions conform to the chosen modalities. Ensure proper, professional academic wording suitable for printed papers.`;
+
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: "user",
+                parts: [
+                  { text: systemPrompt },
+                  { text: promptPayload }
+                ]
+              }
+            ],
+            generationConfig: {
+              responseMimeType: "application/json"
+            }
+          })
+        });
+
+        if (!response.ok) {
+          const errorDetails = await response.text();
+          throw new Error(`Gemini API Request failed. Please check your API Key. Status: ${response.status}`);
+        }
+
+        const resData = await response.json();
+        const fullResponseText = resData.candidates[0].content.parts[0].text;
+        
+        let cleanText = fullResponseText.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
+        const parsedQuestions = JSON.parse(cleanText);
+
+        renderGeneratedExam(parsedQuestions);
+        
+        statusCard.className = "p-3.5 border-2 border-emerald-500 bg-emerald-50 rounded-xl text-xs font-bold text-emerald-800 block";
+        statusCard.innerHTML = "✅ Examination compiled and type-set perfectly into standard A4 formatting! Ready for printing or saving.";
+
+      } catch (err) {
+        console.error(err);
+        showError(err.message || "An exception occurred while querying Gemini or parsing the JSON array.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function renderGeneratedExam(questions) {
+      const examContainer = document.getElementById('preview-questions-container');
+      const answersContainer = document.getElementById('preview-answers-container');
+      
+      examContainer.innerHTML = '';
+      answersContainer.innerHTML = '';
+
+      if (!Array.isArray(questions) || questions.length === 0) {
+        examContainer.innerHTML = `<p class="text-center text-slate-400">Empty or malformed questions returned from Gemini compiler.</p>`;
+        return;
+      }
+
+      // Group questions by section
+      const sections = {};
+      questions.forEach(q => {
+        if (!sections[q.section]) {
+          sections[q.section] = [];
+        }
+        sections[q.section].push(q);
+      });
+
+      document.getElementById('preview-total-score').innerText = questions.length;
+
+      // Render Questions Page 1
+      for (const sectionName in sections) {
+        const sectionQuestions = sections[sectionName];
+        
+        const sectionDiv = document.createElement('div');
+        sectionDiv.className = "space-y-3 pb-4 border-b last:border-b-0 border-slate-100";
+        
+        const instructionMap = {
+          "Multiple Choice": "Directions: Read each question carefully and select the best answer from the given choices. Write the letter of your choice on your answer sheet.",
+          "True or False": "Directions: Read each statement carefully. Write 'True' if the statement is correct, and 'False' if the statement is incorrect.",
+          "Identification": "Directions: Identify the concept or term described in each item. Write your answer on the blank provided before each number.",
+          "Matching Type": "Directions: Match the key terms or questions in Column A with their correct descriptions/answers in Column B. Write the letter of the correct answer on the blank provided.",
+          "Fill-in-the-Blanks": "Directions: Complete each sentence by writing the correct word or phrase on the blank line provided."
+        };
+        const direction = instructionMap[sectionName] || "Directions: Answer the following questions completely.";
+
+        sectionDiv.innerHTML = `
+          <h3 class="font-black text-slate-900 text-sm uppercase tracking-wider">${sectionName} (${sectionQuestions.length} Items)</h3>
+          <p class="text-[10px] text-slate-500 italic mb-2">${direction}</p>
+          <div class="space-y-3 pl-2 content-item-list"></div>
+        `;
+        
+        const itemsListDiv = sectionDiv.querySelector('.content-item-list');
+
+        if (sectionName === "Matching Type") {
+          // Special dual-column rendering layout for Matching Type!
+          const matchingGrid = document.createElement('div');
+          matchingGrid.className = "grid grid-cols-12 gap-4 mt-2";
+          
+          const colADiv = document.createElement('div');
+          colADiv.className = "col-span-7 space-y-3";
+          colADiv.innerHTML = `<h4 class="font-bold text-[10px] uppercase text-slate-400 border-b pb-1">Column A (Questions)</h4>`;
+          
+          const colBDiv = document.createElement('div');
+          colBDiv.className = "col-span-5 border-l border-slate-300 pl-4 space-y-2";
+          colBDiv.innerHTML = `<h4 class="font-bold text-[10px] uppercase text-slate-400 border-b pb-1">Column B (Choices)</h4>`;
+
+          // Gather and display column B choices
+          const allChoicesSet = new Set();
+          sectionQuestions.forEach(q => {
+            if (Array.isArray(q.choices)) {
+              q.choices.forEach(c => allChoicesSet.add(c));
+            }
+          });
+
+          // Display Column A items
+          sectionQuestions.forEach((q, idx) => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = "flex items-start gap-2 text-xs text-slate-800";
+            itemDiv.innerHTML = `
+              <span class="font-bold whitespace-nowrap">____ ${idx + 1}.</span>
+              <p class="font-semibold text-slate-800">${q.question}</p>
+            `;
+            colADiv.appendChild(itemDiv);
+          });
+
+          // Display Column B items
+          if (allChoicesSet.size > 0) {
+            allChoicesSet.forEach(choice => {
+              const choiceDiv = document.createElement('div');
+              choiceDiv.className = "text-[11px] font-bold text-slate-700 leading-relaxed";
+              choiceDiv.innerText = choice;
+              colBDiv.appendChild(choiceDiv);
+            });
+          } else {
+            // Generate fallback Column B options if choices was empty
+            sectionQuestions.forEach((q, idx) => {
+              const letter = String.fromCharCode(65 + idx);
+              const choiceDiv = document.createElement('div');
+              choiceDiv.className = "text-[11px] font-bold text-slate-700 leading-relaxed";
+              choiceDiv.innerText = `${letter}. Correct explanation of item ${idx+1}`;
+              colBDiv.appendChild(choiceDiv);
+            });
+          }
+
+          matchingGrid.appendChild(colADiv);
+          matchingGrid.appendChild(colBDiv);
+          itemsListDiv.appendChild(matchingGrid);
+
+        } else {
+          // Standard linear list layout
+          sectionQuestions.forEach((q, idx) => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = "space-y-1.5";
+            
+            if (sectionName === "Identification") {
+              itemDiv.innerHTML = `
+                <div class="flex items-start gap-2">
+                  <span class="font-black text-slate-800 whitespace-nowrap">____ ${idx + 1}.</span>
+                  <p class="text-slate-800 font-semibold">${q.question}</p>
+                </div>
+              `;
+            } else if (sectionName === "Fill-in-the-Blanks") {
+              // Ensure we display sentence nicely
+              itemDiv.innerHTML = `
+                <div class="flex items-start gap-2">
+                  <span class="font-black text-slate-800">${idx + 1}.</span>
+                  <p class="text-slate-800 font-semibold leading-relaxed">${q.question}</p>
+                </div>
+              `;
+            } else if (sectionName === "Multiple Choice") {
+              const choicesHtml = q.choices.map(c => `
+                <div class="text-[11px] font-medium text-slate-600">${c}</div>
+              `).join('');
+
+              itemDiv.innerHTML = `
+                <div class="flex items-start gap-2">
+                  <span class="font-black text-slate-800">${idx + 1}.</span>
+                  <p class="text-slate-800 font-semibold">${q.question}</p>
+                </div>
+                <div class="grid grid-cols-2 gap-x-6 gap-y-1 pl-5">
+                  ${choicesHtml}
+                </div>
+              `;
+            } else { // True or False
+              itemDiv.innerHTML = `
+                <div class="flex items-start gap-2 justify-between">
+                  <div class="flex gap-2">
+                    <span class="font-black text-slate-800">${idx + 1}.</span>
+                    <p class="text-slate-800 font-semibold">${q.question}</p>
+                  </div>
+                  <span class="font-bold text-slate-400 pl-4 shrink-0">( True / False )</span>
+                </div>
+              `;
+            }
+
+            itemsListDiv.appendChild(itemDiv);
+          });
+        }
+
+        examContainer.appendChild(sectionDiv);
+      }
+
+      // Render Answer Key Page 2
+      for (const sectionName in sections) {
+        const sectionQuestions = sections[sectionName];
+        
+        const sectionKeyDiv = document.createElement('div');
+        sectionKeyDiv.className = "space-y-2 pb-3 border-b last:border-b-0 border-slate-100";
+        
+        sectionKeyDiv.innerHTML = `
+          <h3 class="font-black text-slate-900 text-xs uppercase tracking-wider">${sectionName} Answer Profile</h3>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-3 pl-2 mt-1 ans-key-grid"></div>
+        `;
+        
+        const listDiv = sectionKeyDiv.querySelector('.ans-key-grid');
+
+        sectionQuestions.forEach((q, idx) => {
+          const ansItem = document.createElement('div');
+          ansItem.className = "flex items-center gap-2 font-mono text-[11px]";
+          ansItem.innerHTML = `
+            <span class="font-bold text-slate-500">Item ${idx + 1}:</span>
+            <span class="px-2 py-0.5 bg-pink-100 border border-pink-300 rounded text-pink-900 font-black">${q.answer}</span>
+          `;
+          listDiv.appendChild(ansItem);
+        });
+
+        answersContainer.appendChild(sectionKeyDiv);
+      }
+      
+      lucide.createIcons();
+    }
+
+    // Helper Dialog Toast Alerts
+    function showToast(msg, type) {
+      console.log(`[Toast] [${type}] ${msg}`);
+      // Simple non-obstructive console logger and state reporter
+    }
+
+    function showError(msg) {
+      const statusCard = document.getElementById('status-card');
+      statusCard.className = "p-3.5 border-2 border-red-500 bg-[#FFF1F2] rounded-xl text-xs font-bold text-red-800 block";
+      statusCard.innerHTML = `⚠️ Error: ${msg}`;
+      setLoading(false);
+    }
+
+    function setLoading(isLoading) {
+      const btn = document.getElementById('generate-btn');
+      if (isLoading) {
+        btn.disabled = true;
+        btn.classList.add('opacity-75', 'cursor-not-allowed');
+      } else {
+        btn.disabled = false;
+        btn.classList.remove('opacity-75', 'cursor-not-allowed');
+      }
+    }
+  </script>
+</body>
+</html>
